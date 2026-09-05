@@ -1,0 +1,166 @@
+# Documentation manifest (paths relative to docs/en/)
+# Documentation Standard v1.0 — MarketFlow
+standard: "Documentation Standard v1.0"
+root: "."
+updated: "2026-09-04"
+documents:
+  - id: MF-AI-001
+    path: ai-context.md
+    title: AI Context
+    type: Context
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Informational
+    tags: [ai-ready, entry]
+  - id: MF-OVR-001
+    path: project-overview.md
+    title: Project Overview
+    type: Reference
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [overview]
+  - id: MF-ROAD-001
+    path: roadmap.md
+    title: Roadmap
+    type: Reference
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [roadmap]
+  - id: MF-ARCH-001
+    path: architecture/overview.md
+    title: Architecture Overview
+    type: Architecture
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [architecture]
+  - id: MF-DATA-001
+    path: architecture/data-model.md
+    title: Data Model
+    type: Architecture
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [data]
+  - id: MF-API-001
+    path: contracts/api.md
+    title: API and Access Surface
+    type: Contract
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [contracts, api]
+  - id: MF-SEC-001
+    path: security/security.md
+    title: Security (overall posture)
+    type: Reference
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [security]
+  - id: MF-AUTHN-001
+    path: security/authentication.md
+    title: Authentication
+    type: Reference
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [security, authentication]
+  - id: MF-AUTHZ-001
+    path: security/authorization.md
+    title: Authorization and RBAC
+    type: Reference
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [security, authorization]
+  - id: MF-ADR-001
+    path: decisions/adr-001-cloud-stack.md
+    title: ADR-001 — Cloud Stack: Supabase + Lovable Cloud
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-002
+    path: decisions/adr-002-frontend-stack.md
+    title: ADR-002 — Frontend: React + TypeScript + Vite + shadcn/ui
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-003
+    path: decisions/adr-003-multi-tenant-isolation.md
+    title: ADR-003 — Multi-tenant Isolation via company_id + RLS
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-004
+    path: decisions/adr-004-rbac-roles.md
+    title: ADR-004 — RBAC Roles and Server-side Authorization
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-005
+    path: decisions/adr-005-auth-providers.md
+    title: ADR-005 — Authentication Providers
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-006
+    path: decisions/adr-006-monetization-free-first.md
+    title: ADR-006 — Free First Monetization with Backend Limits
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
+  - id: MF-ADR-007
+    path: decisions/adr-007-design-system.md
+    title: ADR-007 — Design System: shadcn/ui, Content First
+    type: Decision
+    status: DRAFT
+    owner: marketflow-team
+    updated: 2026-09-04
+    review_date: 2026-12-04
+    authority: Draft
+    tags: [decision]
