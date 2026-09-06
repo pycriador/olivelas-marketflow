@@ -53,16 +53,6 @@ export const mockUserCompanies: CompanyUser[] = [
     },
   },
   {
-    id: 'cu-1',
-    company_id: REAL_COMPANY.id,
-    user_id: 'user-default',
-    role: 'admin',
-    active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    company: REAL_COMPANY,
-  },
-  {
     id: 'cu-2',
     company_id: 'comp-2',
     user_id: 'user-default',

@@ -69,7 +69,7 @@ export const CompanySwitcher: React.FC<CompanySwitcherProps> = ({ onOpenCreateMo
               Empresas ativas
             </div>
             <div className="max-h-60 overflow-y-auto space-y-1">
-              {userCompanies.map(cu => {
+              {Array.from(new Map(userCompanies.map(cu => [cu.company_id, cu])).values()).map(cu => {
                 const isSelected = cu.company_id === currentCompany?.id;
                 return (
                   <button

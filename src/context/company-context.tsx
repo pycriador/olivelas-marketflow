@@ -27,17 +27,25 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [allCompanies, setAllCompanies] = useState<Company[]>(() => {
     try {
       const stored = localStorage.getItem(LOCAL_ALL_COMPANIES_KEY);
-      return stored ? JSON.parse(stored) : mockCompanies;
+      const list: Company[] = stored ? JSON.parse(stored) : mockCompanies;
+      const map = new Map<string, Company>();
+      list.forEach(c => map.set(c.id, c));
+      return Array.from(map.values());
     } catch {
       return mockCompanies;
     }
   });
 
   const [userCompanies, setUserCompanies] = useState<CompanyUser[]>(() => {
-    return mockUserCompanies.map(cu => {
+    const map = new Map<string, CompanyUser>();
+    mockUserCompanies.forEach(cu => {
       const liveComp = allCompanies.find(c => c.id === cu.company_id);
-      return liveComp ? { ...cu, company: liveComp } : cu;
+      const enriched = liveComp ? { ...cu, company: liveComp } : cu;
+      if (!map.has(cu.company_id)) {
+        map.set(cu.company_id, enriched);
+      }
     });
+    return Array.from(map.values());
   });
 
   const [currentCompanyId, setCurrentCompanyId] = useState<string>(() => {
