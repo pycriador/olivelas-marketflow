@@ -121,16 +121,15 @@ let __sdk = {};
   function parseInline(text) {
     // 1) extract code spans
     const fragments = [];
-    let rest = text;
     const codeRe = /(`+)([\s\S]*?)\1/g;
     let last = 0;
     let m;
     while ((m = codeRe.exec(text))) {
-      fragments.push({ t: text.slice(last, m.index) });
+      if (m.index > last) fragments.push({ t: text.slice(last, m.index) });
       fragments.push({ code: m[2] });
       last = m.index + m[0].length;
     }
-    if (last === 0) fragments.push({ t: text });
+    if (last < text.length) fragments.push({ t: text.slice(last) });
 
     return fragments
       .map((f) => {

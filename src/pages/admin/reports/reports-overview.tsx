@@ -1,5 +1,18 @@
-import React, { useState } from 'react';
-import { BarChart3, Download, Printer, TrendingUp, Boxes, CalendarDays, DollarSign } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  BarChart3,
+  Download,
+  Printer,
+  TrendingUp,
+  Boxes,
+  CalendarDays,
+  DollarSign,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  AlertTriangle,
+} from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
@@ -8,19 +21,83 @@ import { formatCurrency, formatQuantity, formatDate, getDaysUntilExpiration } fr
 import { useCompany } from '../../../context/company-context';
 import { dataStore } from '../../../lib/data-store';
 
+function getPageNumbers(current: number, total: number): (number | string)[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  if (current <= 4) {
+    return [1, 2, 3, 4, 5, '...', total];
+  }
+  if (current >= total - 3) {
+    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+  }
+  return [1, '...', current - 1, current, current + 1, '...', total];
+}
+
 export const ReportsOverviewPage: React.FC = () => {
   const { currentCompany } = useCompany();
 
-  // URL Query Parameters Sync para a aba ativa
+  // URL Query Parameters Sync para a aba ativa e paginação
   const initialParams = new URLSearchParams(window.location.search);
   const initialTab = (initialParams.get('tab') as 'valuation' | 'expiration' | 'missing_prices') || 'valuation';
   const [activeTab, setActiveTab] = useState<'valuation' | 'expiration' | 'missing_prices'>(initialTab);
 
+  const [page, setPage] = useState(() => {
+    const p = parseInt(initialParams.get('page') || '1', 10);
+    return isNaN(p) || p < 1 ? 1 : p;
+  });
+  const [limit, setLimit] = useState<number>(() => {
+    const l = parseInt(initialParams.get('limit') || '10', 10);
+    return [10, 20, 30].includes(l) ? l : 10;
+  });
+
+  const updateUrlParams = (
+    newTab: 'valuation' | 'expiration' | 'missing_prices',
+    newPage: number = page,
+    newLimit: number = limit
+  ) => {
+    const params = new URLSearchParams();
+    params.set('tab', newTab);
+    if (newPage > 1) params.set('page', newPage.toString());
+    params.set('limit', newLimit.toString());
+
+    const targetUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({}, '', targetUrl);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tab = (params.get('tab') as 'valuation' | 'expiration' | 'missing_prices') || 'valuation';
+      setActiveTab(tab);
+
+      const p = parseInt(params.get('page') || '1', 10);
+      setPage(isNaN(p) || p < 1 ? 1 : p);
+
+      const l = parseInt(params.get('limit') || '10', 10);
+      setLimit([10, 20, 30].includes(l) ? l : 10);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleTabChange = (tab: 'valuation' | 'expiration' | 'missing_prices') => {
     setActiveTab(tab);
-    const params = new URLSearchParams(window.location.search);
-    params.set('tab', tab);
-    window.history.replaceState({}, '', `?${params.toString()}`);
+    setPage(1);
+    updateUrlParams(tab, 1, limit);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+    updateUrlParams(activeTab, 1, newLimit);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    updateUrlParams(activeTab, newPage, limit);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const [products, setProducts] = useState(() => dataStore.getProducts(currentCompany?.id));
@@ -91,6 +168,121 @@ export const ReportsOverviewPage: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Itens da aba ativa para paginação
+  const currentTabItems =
+    activeTab === 'valuation'
+      ? products
+      : activeTab === 'expiration'
+      ? sortedLots
+      : missingPricesProducts;
+
+  const totalItems = currentTabItems.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const startIndex = (safePage - 1) * limit;
+  const endIndex = Math.min(startIndex + limit, totalItems);
+
+  const paginatedProducts = products.slice(startIndex, endIndex);
+  const paginatedLots = sortedLots.slice(startIndex, endIndex);
+  const paginatedMissingPrices = missingPricesProducts.slice(startIndex, endIndex);
+
+  const renderPagination = (itemName: string) => (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t bg-muted/20 text-sm">
+      <div className="text-xs text-muted-foreground">
+        Mostrando <span className="font-semibold text-foreground">{totalItems === 0 ? 0 : startIndex + 1}</span> a{' '}
+        <span className="font-semibold text-foreground">{endIndex}</span> de{' '}
+        <span className="font-semibold text-foreground">{totalItems}</span> {itemName}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-xs text-muted-foreground">Exibir:</span>
+          <div className="inline-flex rounded-md border bg-background p-0.5 shadow-xs">
+            {[10, 20, 30].map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => handleLimitChange(size)}
+                className={`px-2.5 py-1 text-xs font-semibold rounded transition-all ${
+                  limit === size
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">por pág.</span>
+        </div>
+
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(1)}
+            disabled={safePage <= 1}
+            title="Primeira página"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(safePage - 1)}
+            disabled={safePage <= 1}
+            title="Página anterior"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <div className="flex items-center space-x-1 px-1">
+            {getPageNumbers(safePage, totalPages).map((p, idx) =>
+              p === '...' ? (
+                <span key={`ellipsis-${idx}`} className="px-1.5 text-xs text-muted-foreground font-mono">
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={`page-${p}`}
+                  variant={safePage === p ? 'default' : 'outline'}
+                  size="icon"
+                  className="h-8 w-8 text-xs font-semibold"
+                  onClick={() => handlePageChange(p as number)}
+                >
+                  {p}
+                </Button>
+              )
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(safePage + 1)}
+            disabled={safePage >= totalPages}
+            title="Próxima página"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(totalPages)}
+            disabled={safePage >= totalPages}
+            title="Última página"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -200,98 +392,112 @@ export const ReportsOverviewPage: React.FC = () => {
           </div>
 
           {/* Tabela Detalhada por Produto */}
-          <div className="rounded-lg border bg-card shadow-sm overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b bg-muted/50 text-xs font-semibold uppercase text-muted-foreground">
-                <tr>
-                  <th className="p-4">Produto</th>
-                  <th className="p-4 text-center">Qtd Estoque</th>
-                  <th className="p-4 text-right">Preço Custo</th>
-                  <th className="p-4 text-right">Preço Venda</th>
-                  <th className="p-4 text-right">Total Custo</th>
-                  <th className="p-4 text-right">Total Venda</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y font-mono text-xs">
-                {products.map(p => {
-                  const inv = inventory.find(i => i.product_id === p.id);
-                  const qty = inv ? inv.quantity : 0;
-                  return (
-                    <tr key={p.id} className="hover:bg-muted/30">
-                      <td className="p-4 font-sans font-medium text-foreground">{p.name}</td>
-                      <td className="p-4 text-center font-bold">{qty} {p.unit}</td>
-                      <td className="p-4 text-right">{formatCurrency(p.cost_price)}</td>
-                      <td className="p-4 text-right font-bold text-foreground">{formatCurrency(p.sale_price)}</td>
-                      <td className="p-4 text-right text-muted-foreground">{formatCurrency(qty * p.cost_price)}</td>
-                      <td className="p-4 text-right text-success font-bold">{formatCurrency(qty * p.sale_price)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b bg-muted/50 text-xs font-semibold uppercase text-muted-foreground">
+                  <tr>
+                    <th className="p-4">Produto</th>
+                    <th className="p-4 text-center">Qtd Estoque</th>
+                    <th className="p-4 text-right">Preço Custo</th>
+                    <th className="p-4 text-right">Preço Venda</th>
+                    <th className="p-4 text-right">Total Custo</th>
+                    <th className="p-4 text-right">Total Venda</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y font-mono text-xs">
+                  {paginatedProducts.map(p => {
+                    const inv = inventory.find(i => i.product_id === p.id);
+                    const qty = inv ? inv.quantity : 0;
+                    return (
+                      <tr key={p.id} className="hover:bg-muted/30">
+                        <td className="p-4 font-sans font-medium text-foreground">{p.name}</td>
+                        <td className="p-4 text-center font-bold">{qty} {p.unit}</td>
+                        <td className="p-4 text-right">{formatCurrency(p.cost_price)}</td>
+                        <td className="p-4 text-right font-bold text-foreground">{formatCurrency(p.sale_price)}</td>
+                        <td className="p-4 text-right text-muted-foreground">{formatCurrency(qty * p.cost_price)}</td>
+                        <td className="p-4 text-right text-success font-bold">{formatCurrency(qty * p.sale_price)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {renderPagination('produtos')}
           </div>
         </div>
       )}
 
       {/* Conteúdo da Aba 2: Curva de Validade de Lotes */}
       {activeTab === 'expiration' && (
-        <div className="rounded-lg border bg-card shadow-sm overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b bg-muted/50 text-xs font-semibold uppercase text-muted-foreground">
-              <tr>
-                <th className="p-4">Lote</th>
-                <th className="p-4">Produto</th>
-                <th className="p-4 text-center">Data de Validade</th>
-                <th className="p-4 text-center">Quantidade</th>
-                <th className="p-4 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {sortedLots.map(lot => {
-                const prod = products.find(p => p.id === lot.product_id);
-                const days = getDaysUntilExpiration(lot.expiration_date);
+        <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b bg-muted/50 text-xs font-semibold uppercase text-muted-foreground">
+                <tr>
+                  <th className="p-4">Lote</th>
+                  <th className="p-4">Produto</th>
+                  <th className="p-4 text-center">Data de Validade</th>
+                  <th className="p-4 text-center">Quantidade</th>
+                  <th className="p-4 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {paginatedLots.map(lot => {
+                  const prod = products.find(p => p.id === lot.product_id);
+                  const days = getDaysUntilExpiration(lot.expiration_date);
 
-                return (
-                  <tr key={lot.id} className="hover:bg-muted/30">
-                    <td className="p-4 font-mono font-bold">{lot.lot_number}</td>
-                    <td className="p-4 font-medium">{prod?.name || 'Produto'}</td>
-                    <td className="p-4 text-center font-mono">{formatDate(lot.expiration_date)}</td>
-                    <td className="p-4 text-center font-mono font-semibold">{lot.current_quantity} {prod?.unit || 'un'}</td>
-                    <td className="p-4 text-center">
-                      <Badge variant={days !== null && days <= 15 ? 'destructive' : 'warning'}>
-                        {days === 0 ? 'Vence hoje' : days && days < 0 ? 'Vencido' : `${days} dias restantes`}
-                      </Badge>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                  return (
+                    <tr key={lot.id} className="hover:bg-muted/30">
+                      <td className="p-4 font-mono font-bold">{lot.lot_number}</td>
+                      <td className="p-4 font-medium">{prod?.name || 'Produto'}</td>
+                      <td className="p-4 text-center font-mono">{formatDate(lot.expiration_date)}</td>
+                      <td className="p-4 text-center font-mono font-semibold">{lot.current_quantity} {prod?.unit || 'un'}</td>
+                      <td className="p-4 text-center">
+                        <Badge variant={days !== null && days <= 15 ? 'destructive' : 'warning'}>
+                          {days === 0 ? 'Vence hoje' : days && days < 0 ? 'Vencido' : `${days} dias restantes`}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {renderPagination('lotes')}
         </div>
       )}
 
       {/* Conteúdo da Aba 3: Conferência de Preços */}
       {activeTab === 'missing_prices' && (
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base">Inconsistências de Preço ou Cadastro</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {missingPricesProducts.length === 0 ? (
-              <p className="text-sm text-muted-foreground p-4 text-center">
+              <p className="text-sm text-muted-foreground p-6 text-center">
                 Todos os produtos cadastrados possuem preço de custo e venda válidos.
               </p>
             ) : (
-              <div className="divide-y">
-                {missingPricesProducts.map(p => (
-                  <div key={p.id} className="flex items-center justify-between py-3">
-                    <div>
-                      <p className="text-sm font-semibold">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">SKU: {p.sku || 'Sem SKU'}</p>
+              <div>
+                <div className="divide-y px-6">
+                  {paginatedMissingPrices.map(p => (
+                    <div key={p.id} className="flex items-center justify-between py-3">
+                      <div>
+                        <p className="text-sm font-semibold">{p.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">SKU: {p.sku || 'Sem SKU'}</p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs font-mono text-muted-foreground">
+                          Custo: {formatCurrency(p.cost_price)} | Venda: {formatCurrency(p.sale_price)}
+                        </span>
+                        <Badge variant="destructive">Revisar Preço</Badge>
+                      </div>
                     </div>
-                    <Badge variant="destructive">Revisar Preço</Badge>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {renderPagination('produtos com inconsistências')}
               </div>
             )}
           </CardContent>
