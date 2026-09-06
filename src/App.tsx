@@ -79,7 +79,7 @@ export const App: React.FC = () => {
   // Sincronização bidirecional com o histórico de navegação do browser (URL)
   React.useEffect(() => {
     const handlePopState = () => {
-      const appPath = getAppPath(window.location.pathname) || '/admin/dashboard';
+      const appPath = (getAppPath(window.location.pathname) || '/admin/dashboard').split('?')[0];
       setCurrentPath(appPath);
 
       const match = appPath.match(/^\/admin\/products\/([a-zA-Z0-9_-]+)$/);
@@ -93,28 +93,30 @@ export const App: React.FC = () => {
   }, []);
 
   const navigate = (path: string) => {
+    const cleanPath = path.split('?')[0];
     const targetBrowserUrl = getBrowserPath(path);
-    if (targetBrowserUrl !== window.location.pathname) {
+    const currentBrowserUrl = window.location.pathname + window.location.search;
+    if (targetBrowserUrl !== currentBrowserUrl) {
       window.history.pushState({}, '', targetBrowserUrl);
     }
 
-    if (path === '/admin/products/new') {
+    if (cleanPath === '/admin/products/new') {
       setEditingProduct(null);
       setCurrentPath('/admin/products/edit');
       return;
     }
 
-    const editMatch = path.match(/^\/admin\/products\/([a-zA-Z0-9_-]+)$/);
+    const editMatch = cleanPath.match(/^\/admin\/products\/([a-zA-Z0-9_-]+)$/);
     if (editMatch && editMatch[1] !== 'new' && editMatch[1] !== 'edit' && editMatch[1] !== 'import' && editMatch[1] !== 'labels' && editMatch[1] !== 'price-history') {
       const prod = dataStore.getProductById(editMatch[1]);
       if (prod) {
         setEditingProduct(prod);
-        setCurrentPath(path);
+        setCurrentPath(cleanPath);
         return;
       }
     }
 
-    setCurrentPath(path);
+    setCurrentPath(cleanPath);
   };
 
   const handleEditProduct = (product: Product) => {
