@@ -203,6 +203,64 @@ export function getRealBrands(companyId: string = REAL_COMPANY.id): Brand[] {
   }));
 }
 
+export function getRealExpirationDate(categoryId: string, itemId: string): string | undefined {
+  const addDays = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
+
+  switch (categoryId) {
+    case 'frutas':
+      if (itemId === 'fru-banana-prata') return addDays(3); // Vence em breve
+      if (itemId === 'fru-mamao-papaya') return addDays(5);
+      if (itemId === 'fru-uva-thompson') return addDays(7);
+      if (itemId === 'fru-pera-williams') return addDays(9);
+      return addDays(12);
+    case 'frios-queijos':
+      if (itemId === 'fq-presunto-seara') return addDays(5); // Vence em 5 dias
+      if (itemId === 'fq-queijo-prato-sadia') return addDays(12);
+      if (itemId === 'fq-mussarela-tirolez') return addDays(15);
+      return addDays(40);
+    case 'paes-bolos':
+      if (itemId === 'pb-croissant') return addDays(3); // Padaria artesanal
+      if (itemId === 'pb-rosca-coco') return addDays(5);
+      if (itemId === 'pb-pao-forma-pullman') return addDays(14);
+      if (itemId === 'pb-bisnaguinha-wickbold') return addDays(18);
+      if (itemId === 'pb-bolo-anamaria') return addDays(30);
+      return addDays(90);
+    case 'bebidas':
+      if (itemId === 'beb-iog-danone-170') return addDays(7);
+      if (itemId === 'beb-suco-natone-500') return addDays(14);
+      if (itemId === 'beb-ades-500') return addDays(45);
+      if (itemId === 'beb-suco-delvalle-200') return addDays(60);
+      if (itemId === 'beb-toddynho-200') return addDays(75);
+      if (itemId === 'beb-agua-coco-200') return addDays(90);
+      if (itemId === 'beb-cha-leao-450') return addDays(90);
+      if (itemId === 'beb-maguary-1l') return addDays(100);
+      if (itemId === 'beb-suco-aurora-1l') return addDays(120);
+      return addDays(180);
+    case 'biscoitos':
+      if (itemId === 'bis-club-social') return addDays(90);
+      if (itemId === 'bis-cream-cracker-adria') return addDays(120);
+      return addDays(150);
+    case 'doces-geleias':
+      if (itemId === 'doc-mel-silvestre') return addDays(365);
+      if (itemId === 'doc-doce-leite-vicosa') return addDays(180);
+      if (itemId === 'doc-geleia-queensberry') return addDays(240);
+      return addDays(300);
+    case 'chocolates':
+      if (itemId === 'choc-bombom-sonho') return addDays(120);
+      if (itemId === 'choc-barra-milka') return addDays(180);
+      if (itemId === 'choc-ferrero-rocher') return addDays(180);
+      return addDays(240);
+    case 'canecas-brindes':
+      return undefined; // Não perecível
+    default:
+      return addDays(60);
+  }
+}
+
 export function getRealProducts(companyId: string = REAL_COMPANY.id): Product[] {
   const products: Product[] = [];
 
@@ -221,6 +279,7 @@ export function getRealProducts(companyId: string = REAL_COMPANY.id): Product[] 
         sale_price: item.preco,
         minimum_stock: 5,
         maximum_stock: 50,
+        expiration_date: getRealExpirationDate(cat.id, item.id),
         active: true,
         catalog_visible: true,
         show_price: true,

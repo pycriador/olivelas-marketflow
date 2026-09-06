@@ -126,6 +126,7 @@ export interface Product {
   minimum_stock: number;
   maximum_stock?: number;
   image_url?: string;
+  expiration_date?: string;
   active: boolean;
   catalog_visible: boolean;
   show_price: boolean;

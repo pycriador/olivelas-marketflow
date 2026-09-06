@@ -9,7 +9,6 @@ import { InputMoney } from '../../../components/ui/input-money';
 import { InputQuantity } from '../../../components/ui/input-quantity';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
-import { mockCategories, mockBrands, mockSuppliers } from '../../../lib/supabase';
 import { useCompany } from '../../../context/company-context';
 import { Product } from '../../../types';
 import { dataStore } from '../../../lib/data-store';
@@ -28,6 +27,7 @@ const productSchema = z.object({
   brand_id: z.string().optional(),
   default_supplier_id: z.string().optional(),
   image_url: z.string().url('URL de imagem inválida').or(z.literal('')).optional(),
+  expiration_date: z.string().optional(),
   active: z.boolean().default(true),
   catalog_visible: z.boolean().default(true),
   show_price: z.boolean().default(true),
@@ -49,9 +49,9 @@ export const ProductFormPage: React.FC<ProductFormPageProps> = ({ initialProduct
   const { currentCompany } = useCompany();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = mockCategories.filter(c => c.company_id === currentCompany?.id || c.company_id === 'comp-cesta-1');
-  const brands = mockBrands.filter(b => b.company_id === currentCompany?.id || b.company_id === 'comp-cesta-1');
-  const suppliers = mockSuppliers.filter(s => s.company_id === currentCompany?.id || s.company_id === 'comp-cesta-1');
+  const categories = dataStore.getCategories(currentCompany?.id);
+  const brands = dataStore.getBrands(currentCompany?.id);
+  const suppliers = dataStore.getSuppliers(currentCompany?.id);
 
   const {
     register,
@@ -76,6 +76,7 @@ export const ProductFormPage: React.FC<ProductFormPageProps> = ({ initialProduct
       brand_id: initialProduct.brand_id || '',
       default_supplier_id: initialProduct.default_supplier_id || '',
       image_url: initialProduct.image_url || '',
+      expiration_date: initialProduct.expiration_date || '',
       active: initialProduct.active,
       catalog_visible: initialProduct.catalog_visible,
       show_price: initialProduct.show_price,
@@ -88,6 +89,7 @@ export const ProductFormPage: React.FC<ProductFormPageProps> = ({ initialProduct
       cost_price: 0,
       sale_price: 0,
       minimum_stock: 5,
+      expiration_date: '',
       active: true,
       catalog_visible: true,
       show_price: true,
@@ -307,7 +309,7 @@ export const ProductFormPage: React.FC<ProductFormPageProps> = ({ initialProduct
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 pt-2">
+                <div className="grid gap-4 sm:grid-cols-3 pt-2">
                   <div>
                     <label className="block text-xs font-semibold uppercase text-muted-foreground mb-1">
                       Estoque Mínimo (Alerta)
@@ -342,6 +344,23 @@ export const ProductFormPage: React.FC<ProductFormPageProps> = ({ initialProduct
                         <option key={s.id} value={s.id}>{s.name}</option>
                       ))}
                     </select>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Fornecedor principal vinculado para reposição.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold uppercase text-muted-foreground mb-1">
+                      Data de Validade
+                    </label>
+                    <Input
+                      type="date"
+                      {...register('expiration_date')}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      Prazo de validade do produto ou lote atual.
+                    </p>
                   </div>
                 </div>
               </CardContent>

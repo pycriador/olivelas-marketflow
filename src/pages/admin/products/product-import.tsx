@@ -5,9 +5,9 @@ import { Badge } from '../../../components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
 import { formatCurrency } from '../../../lib/utils';
-import { mockProducts } from '../../../lib/supabase';
 import { useCompany } from '../../../context/company-context';
 import { Product } from '../../../types';
+import { dataStore } from '../../../lib/data-store';
 
 interface CsvRow {
   name: string;
@@ -115,7 +115,7 @@ export const ProductImportPage: React.FC<{ onBack: () => void; onImportComplete:
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      mockProducts.unshift(newProd);
+      dataStore.saveProduct(newProd);
     });
 
     setIsImported(true);

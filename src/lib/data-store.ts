@@ -263,7 +263,30 @@ class DataStore {
 
   // PRODUTOS
   getProducts(companyId?: string): Product[] {
-    const all = loadFromStorage<Product[]>(STORAGE_KEYS.PRODUCTS, initialProducts);
+    let all = loadFromStorage<Product[]>(STORAGE_KEYS.PRODUCTS, initialProducts);
+
+    // Se os dados no storage forem os mocks antigos genéricos (ex: prod-1) ou vazios, substitui pelos dados reais da cesta
+    if (all.some(p => p.id === 'prod-1' || p.id === 'prod-2')) {
+      all = initialProducts;
+      saveToStorage(STORAGE_KEYS.PRODUCTS, all);
+    } else {
+      // Auto-migração: enriquece produtos existentes sem data de validade com as datas reais calculadas
+      let hasChanges = false;
+      const realMap = new Map(initialProducts.map(p => [p.id, p]));
+      all = all.map(p => {
+        const real = realMap.get(p.id);
+        if (!p.expiration_date && real?.expiration_date) {
+          hasChanges = true;
+          return { ...p, expiration_date: real.expiration_date };
+        }
+        return p;
+      });
+
+      if (hasChanges) {
+        saveToStorage(STORAGE_KEYS.PRODUCTS, all);
+      }
+    }
+
     if (!companyId) return all;
     return all.filter(p => p.company_id === companyId || p.company_id === 'comp-cesta-1');
   }

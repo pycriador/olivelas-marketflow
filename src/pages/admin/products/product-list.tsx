@@ -26,7 +26,7 @@ import { Badge } from '../../../components/ui/badge';
 import { Card } from '../../../components/ui/card';
 import { EmptyState } from '../../../components/ui/empty-state';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
-import { formatCurrency, formatQuantity } from '../../../lib/utils';
+import { formatCurrency, formatQuantity, formatDate, getDaysUntilExpiration } from '../../../lib/utils';
 import { useCompany } from '../../../context/company-context';
 import { Product } from '../../../types';
 import { dataStore } from '../../../lib/data-store';
@@ -62,6 +62,7 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
   const [selectedCategory, setSelectedCategory] = useState<string>(initialParams.get('category') || 'all');
   const [statusFilter, setStatusFilter] = useState<string>(initialParams.get('status') || 'all');
   const [basketFilter, setBasketFilter] = useState<string>(initialParams.get('basket') || 'all');
+  const [validityFilter, setValidityFilter] = useState<string>(initialParams.get('validity') || 'all');
 
   const parsedPage = parseInt(initialParams.get('page') || '1', 10);
   const [page, setPage] = useState<number>(isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage);
@@ -74,6 +75,7 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
     newCat: string,
     newStatus: string,
     newBasket: string,
+    newValidity: string,
     newPage: number,
     newLimit: number
   ) => {
@@ -82,6 +84,7 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
     if (newCat !== 'all') params.set('category', newCat);
     if (newStatus !== 'all') params.set('status', newStatus);
     if (newBasket !== 'all') params.set('basket', newBasket);
+    if (newValidity !== 'all') params.set('validity', newValidity);
 
     // Paginação sempre expressa na URL
     params.set('page', newPage.toString());
@@ -100,6 +103,7 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
       setSelectedCategory(params.get('category') || 'all');
       setStatusFilter(params.get('status') || 'all');
       setBasketFilter(params.get('basket') || 'all');
+      setValidityFilter(params.get('validity') || 'all');
 
       const p = parseInt(params.get('page') || '1', 10);
       setPage(isNaN(p) || p < 1 ? 1 : p);
@@ -115,55 +119,69 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
   const handleSearchChange = (val: string) => {
     setSearch(val);
     setPage(1);
-    updateUrlParams(val, selectedCategory, statusFilter, basketFilter, 1, limit);
+    updateUrlParams(val, selectedCategory, statusFilter, basketFilter, validityFilter, 1, limit);
   };
 
   const handleCategoryChange = (val: string) => {
     setSelectedCategory(val);
     setPage(1);
-    updateUrlParams(search, val, statusFilter, basketFilter, 1, limit);
+    updateUrlParams(search, val, statusFilter, basketFilter, validityFilter, 1, limit);
   };
 
   const handleStatusChange = (val: string) => {
     setStatusFilter(val);
     setPage(1);
-    updateUrlParams(search, selectedCategory, val, basketFilter, 1, limit);
+    updateUrlParams(search, selectedCategory, val, basketFilter, validityFilter, 1, limit);
   };
 
   const handleBasketChange = (val: string) => {
     setBasketFilter(val);
     setPage(1);
-    updateUrlParams(search, selectedCategory, statusFilter, val, 1, limit);
+    updateUrlParams(search, selectedCategory, statusFilter, val, validityFilter, 1, limit);
+  };
+
+  const handleValidityChange = (val: string) => {
+    setValidityFilter(val);
+    setPage(1);
+    updateUrlParams(search, selectedCategory, statusFilter, basketFilter, val, 1, limit);
   };
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setPage(1);
-    updateUrlParams(search, selectedCategory, statusFilter, basketFilter, 1, newLimit);
+    updateUrlParams(search, selectedCategory, statusFilter, basketFilter, validityFilter, 1, newLimit);
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    updateUrlParams(search, selectedCategory, statusFilter, basketFilter, newPage, limit);
+    updateUrlParams(search, selectedCategory, statusFilter, basketFilter, validityFilter, newPage, limit);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const [products, setProducts] = useState<Product[]>(() =>
     dataStore.getProducts(currentCompany?.id)
   );
+  const [categories, setCategories] = useState(() =>
+    dataStore.getCategories(currentCompany?.id)
+  );
+  const [brands, setBrands] = useState(() =>
+    dataStore.getBrands(currentCompany?.id)
+  );
+  const [inventory, setInventory] = useState(() =>
+    dataStore.getInventory(currentCompany?.id)
+  );
 
   // Escuta alterações reativas no dataStore
   React.useEffect(() => {
     const handleUpdate = () => {
       setProducts(dataStore.getProducts(currentCompany?.id));
+      setCategories(dataStore.getCategories(currentCompany?.id));
+      setBrands(dataStore.getBrands(currentCompany?.id));
+      setInventory(dataStore.getInventory(currentCompany?.id));
     };
     window.addEventListener('marketflow_datastore_change', handleUpdate);
     return () => window.removeEventListener('marketflow_datastore_change', handleUpdate);
   }, [currentCompany]);
-
-  const categories = dataStore.getCategories(currentCompany?.id);
-  const brands = dataStore.getBrands(currentCompany?.id);
-  const inventory = dataStore.getInventory(currentCompany?.id);
 
   // Filtragem de busca e dropdown
   const filteredProducts = products.filter(p => {
@@ -181,7 +199,20 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
       basketFilter === 'all' ||
       (basketFilter === 'basket_only' ? p.active_in_basket !== false : p.active_in_basket === false);
 
-    return matchesSearch && matchesCat && matchesStatus && matchesBasket;
+    let matchesValidity = true;
+    if (validityFilter === 'expired') {
+      matchesValidity = !!p.expiration_date && (getDaysUntilExpiration(p.expiration_date) ?? 1) < 0;
+    } else if (validityFilter === 'near_expiry') {
+      const days = getDaysUntilExpiration(p.expiration_date);
+      matchesValidity = !!p.expiration_date && days !== null && days >= 0 && days <= 15;
+    } else if (validityFilter === 'valid') {
+      const days = getDaysUntilExpiration(p.expiration_date);
+      matchesValidity = !!p.expiration_date && days !== null && days > 15;
+    } else if (validityFilter === 'non_perishable') {
+      matchesValidity = !p.expiration_date;
+    }
+
+    return matchesSearch && matchesCat && matchesStatus && matchesBasket && matchesValidity;
   });
 
   // Cálculo da Paginação
@@ -249,6 +280,47 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
                   ],
                 },
                 {
+                  id: 'validity',
+                  title: 'Data de Validade',
+                  selectedValue: validityFilter,
+                  onChange: handleValidityChange,
+                  options: [
+                    { id: 'all', label: 'Todos os Prazos' },
+                    {
+                      id: 'near_expiry',
+                      label: 'Próximos do Vencimento (≤ 15 dias)',
+                      badge: products.filter(p => {
+                        if (!p.expiration_date) return false;
+                        const d = getDaysUntilExpiration(p.expiration_date);
+                        return d !== null && d >= 0 && d <= 15;
+                      }).length,
+                    },
+                    {
+                      id: 'expired',
+                      label: 'Vencidos',
+                      badge: products.filter(p => {
+                        if (!p.expiration_date) return false;
+                        const d = getDaysUntilExpiration(p.expiration_date);
+                        return d !== null && d < 0;
+                      }).length,
+                    },
+                    {
+                      id: 'valid',
+                      label: 'Dentro da Validade (> 15 dias)',
+                      badge: products.filter(p => {
+                        if (!p.expiration_date) return false;
+                        const d = getDaysUntilExpiration(p.expiration_date);
+                        return d !== null && d > 15;
+                      }).length,
+                    },
+                    {
+                      id: 'non_perishable',
+                      label: 'Não Perecíveis',
+                      badge: products.filter(p => !p.expiration_date).length,
+                    },
+                  ],
+                },
+                {
                   id: 'category',
                   title: 'Categorias',
                   selectedValue: selectedCategory,
@@ -289,14 +361,76 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
                 setSelectedCategory('all');
                 setStatusFilter('all');
                 setBasketFilter('all');
+                setValidityFilter('all');
                 setSearch('');
                 setPage(1);
                 setLimit(10);
-                updateUrlParams('', 'all', 'all', 'all', 1, 10);
+                updateUrlParams('', 'all', 'all', 'all', 'all', 1, 10);
               }}
             />
           </div>
         </div>
+
+        {/* Chips de Filtros Ativos */}
+        {(selectedCategory !== 'all' || statusFilter !== 'all' || basketFilter !== 'all' || validityFilter !== 'all' || search) && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-3 mt-3 border-t text-xs">
+            <span className="text-muted-foreground text-[11px]">Filtros aplicados:</span>
+            {selectedCategory !== 'all' && (
+              <Badge variant="secondary" className="text-[11px] py-0 px-2 flex items-center space-x-1">
+                <span>Categoria: {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}</span>
+                <button onClick={() => handleCategoryChange('all')} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
+            {validityFilter !== 'all' && (
+              <Badge variant="secondary" className="text-[11px] py-0 px-2 flex items-center space-x-1">
+                <span>
+                  Validade:{' '}
+                  {validityFilter === 'expired'
+                    ? 'Vencidos'
+                    : validityFilter === 'near_expiry'
+                    ? 'Vencendo logo (≤ 15d)'
+                    : validityFilter === 'valid'
+                    ? 'No prazo (> 15d)'
+                    : 'Não perecível'}
+                </span>
+                <button onClick={() => handleValidityChange('all')} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
+            {statusFilter !== 'all' && (
+              <Badge variant="secondary" className="text-[11px] py-0 px-2 flex items-center space-x-1">
+                <span>Status: {statusFilter === 'active' ? 'Ativos' : 'Inativos'}</span>
+                <button onClick={() => handleStatusChange('all')} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
+            {basketFilter !== 'all' && (
+              <Badge variant="secondary" className="text-[11px] py-0 px-2 flex items-center space-x-1">
+                <span>{basketFilter === 'basket_only' ? 'Na Cesta' : 'Fora da Cesta'}</span>
+                <button onClick={() => handleBasketChange('all')} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
+            {search && (
+              <Badge variant="secondary" className="text-[11px] py-0 px-2 flex items-center space-x-1">
+                <span>Busca: "{search}"</span>
+                <button onClick={() => handleSearchChange('')} className="ml-1 hover:text-destructive">×</button>
+              </Badge>
+            )}
+            <button
+              onClick={() => {
+                setSelectedCategory('all');
+                setStatusFilter('all');
+                setBasketFilter('all');
+                setValidityFilter('all');
+                setSearch('');
+                setPage(1);
+                setLimit(10);
+                updateUrlParams('', 'all', 'all', 'all', 'all', 1, 10);
+              }}
+              className="text-[11px] text-primary hover:underline ml-1"
+            >
+              Limpar todos
+            </button>
+          </div>
+        )}
       </Card>
 
       {/* Tabela / Grid de Produtos */}
@@ -317,6 +451,7 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
                   <th className="p-4">Produto</th>
                   <th className="p-4">Categoria / Marca</th>
                   <th className="p-4 text-right">Preço de Venda</th>
+                  <th className="p-4 text-center">Validade</th>
                   <th className="p-4 text-center">Estoque Atual</th>
                   <th className="p-4 text-center">Catálogo</th>
                   <th className="p-4 text-center">Status</th>
@@ -373,6 +508,51 @@ export const ProductListPage: React.FC<ProductListProps> = ({ onNavigate, onEdit
                           </div>
                         ) : (
                           formatCurrency(product.sale_price)
+                        )}
+                      </td>
+                      <td className="p-4 text-center">
+                        {product.expiration_date ? (
+                          (() => {
+                            const daysLeft = getDaysUntilExpiration(product.expiration_date);
+                            if (daysLeft !== null && daysLeft < 0) {
+                              return (
+                                <div className="inline-flex flex-col items-center">
+                                  <Badge variant="destructive" className="text-[10px] py-0 px-1.5 font-mono">
+                                    Vencido ({Math.abs(daysLeft)}d)
+                                  </Badge>
+                                  <span className="text-[10px] text-destructive font-mono mt-0.5">
+                                    {formatDate(product.expiration_date)}
+                                  </span>
+                                </div>
+                              );
+                            }
+                            if (daysLeft !== null && daysLeft <= 15) {
+                              return (
+                                <div className="inline-flex flex-col items-center">
+                                  <Badge variant="warning" className="text-[10px] py-0 px-1.5 font-mono">
+                                    {daysLeft === 0 ? 'Vence hoje' : `Vence em ${daysLeft}d`}
+                                  </Badge>
+                                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono mt-0.5">
+                                    {formatDate(product.expiration_date)}
+                                  </span>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div className="inline-flex flex-col items-center">
+                                <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-mono border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                                  {formatDate(product.expiration_date)}
+                                </Badge>
+                                {daysLeft !== null && (
+                                  <span className="text-[10px] text-muted-foreground font-mono mt-0.5">
+                                    em {daysLeft} dias
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">Não perecível</span>
                         )}
                       </td>
                       <td className="p-4 text-center">

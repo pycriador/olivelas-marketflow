@@ -6,7 +6,6 @@ import { InputMoney } from '../../../components/ui/input-money';
 import { Badge } from '../../../components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
-import { mockCategories, mockBrands, mockProducts } from '../../../lib/supabase';
 import { useCompany } from '../../../context/company-context';
 import { Product } from '../../../types';
 import { dataStore } from '../../../lib/data-store';

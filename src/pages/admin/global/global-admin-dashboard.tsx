@@ -3,11 +3,14 @@ import { ShieldCheck, Store, Users, Sparkles, Server, CheckCircle2, TrendingUp }
 import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
-import { mockCompanies, mockUserCompanies, mockProducts } from '../../../lib/supabase';
+import { mockUserCompanies } from '../../../lib/supabase';
 import { useAuth } from '../../../context/auth-context';
+import { dataStore } from '../../../lib/data-store';
 
 export const GlobalAdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const companies = dataStore.getCompanies();
+  const products = dataStore.getProducts();
 
   return (
     <div className="space-y-6">
@@ -36,7 +39,7 @@ export const GlobalAdminDashboardPage: React.FC = () => {
             <Store className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold font-mono">{mockCompanies.length}</div>
+            <div className="text-2xl font-bold font-mono">{companies.length}</div>
             <p className="text-xs text-muted-foreground mt-1">100% ativas no plano Free</p>
           </CardContent>
         </Card>
@@ -101,8 +104,8 @@ export const GlobalAdminDashboardPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y font-mono">
-                {mockCompanies.map(comp => {
-                  const compProds = mockProducts.filter(p => p.company_id === comp.id);
+                {companies.map(comp => {
+                  const compProds = products.filter(p => p.company_id === comp.id);
                   return (
                     <tr key={comp.id} className="hover:bg-muted/30">
                       <td className="p-3 font-sans font-bold text-foreground">{comp.name}</td>

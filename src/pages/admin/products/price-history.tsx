@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../../components/ui
 import { Badge } from '../../../components/ui/badge';
 import { Breadcrumbs } from '../../../components/layout/breadcrumbs';
 import { formatCurrency, formatDate } from '../../../lib/utils';
-import { mockProducts } from '../../../lib/supabase';
+import { dataStore } from '../../../lib/data-store';
 import { useCompany } from '../../../context/company-context';
 
 export interface PriceHistoryRecord {
@@ -24,7 +24,7 @@ export interface PriceHistoryRecord {
 
 export const PriceHistoryPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { currentCompany } = useCompany();
-  const products = mockProducts.filter(p => p.company_id === currentCompany?.id);
+  const products = dataStore.getProducts(currentCompany?.id);
   const [selectedProductId, setSelectedProductId] = useState<string>('all');
 
   const historyRecords: PriceHistoryRecord[] = [
