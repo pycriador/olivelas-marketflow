@@ -60,7 +60,7 @@ function getBrowserPath(path: string): string {
 }
 
 export const App: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [currentPath, setCurrentPath] = useState<string>(() => {
     const appPath = getAppPath(window.location.pathname);
     if (appPath && appPath !== '/') return appPath;
@@ -189,11 +189,26 @@ export const App: React.FC = () => {
     );
   }
 
-  // Tratamento de Autenticação
+  // Estado de carregamento da sessão de autenticação
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-2xl shadow-lg animate-pulse">
+            M
+          </div>
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-xs text-muted-foreground font-medium">Verificando sessão segura...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Tratamento de Autenticação Real
   if (!isAuthenticated) {
     return (
       <LoginPage
-        onNavigateToSignup={() => {}}
+        initialMode={currentPath === '/cadastro' || currentPath === '/register' ? 'signup' : 'login'}
         onSuccess={() => navigate('/admin/dashboard')}
       />
     );

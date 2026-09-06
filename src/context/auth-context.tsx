@@ -8,7 +8,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
-  signupWithEmail: (email: string, pass: string, name: string) => Promise<void>;
+  signupWithEmail: (email: string, pass: string, name: string) => Promise<{ user: any; session: any }>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -16,197 +16,213 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<{ id: string; email: string } | null>({
-    id: 'user-willian-global',
-    email: 'willian.o.jesus@gmail.com',
-  });
-  const [profile, setProfile] = useState<Profile | null>({
-    id: 'user-willian-global',
-    full_name: 'Willian Oliveira (Global Admin)',
-    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80',
-    phone: '(11) 99999-8888',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Inicialização e escuta da sessão real do Supabase
   useEffect(() => {
-    if (isSupabaseConfigured()) {
-      supabase.auth.getSession().then(async ({ data: { session } }) => {
-        if (session?.user) {
-          const isGlobalAdmin = session.user.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
-          const uid = session.user.id;
-          setUser({ id: uid, email: session.user.email || '' });
+    let isMounted = true;
+
+    async function initSession() {
+      if (!isSupabaseConfigured()) {
+        if (isMounted) setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn('Erro ao obter sessão do Supabase:', error.message);
+        }
+
+        if (session?.user && isMounted) {
+          const authUser = session.user;
+          const isGlobalAdmin = authUser.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
+          const uid = authUser.id;
+
+          setUser({ id: uid, email: authUser.email || '' });
 
           try {
-            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
-            setProfile({
-              id: uid,
-              full_name: profileRow?.full_name || session.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : 'Comerciante'),
-              avatar_url: profileRow?.avatar_url,
-              phone: profileRow?.phone,
-              created_at: profileRow?.created_at || new Date().toISOString(),
-              updated_at: profileRow?.updated_at || new Date().toISOString(),
-            });
-          } catch {
-            setProfile({
-              id: uid,
-              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            });
-          }
-        }
-      });
+            const { data: profileRow } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', uid)
+              .single();
 
+            if (isMounted) {
+              setProfile({
+                id: uid,
+                full_name: profileRow?.full_name || authUser.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(authUser.email || '')),
+                avatar_url: profileRow?.avatar_url || authUser.user_metadata?.avatar_url,
+                phone: profileRow?.phone || authUser.user_metadata?.phone,
+                created_at: profileRow?.created_at || new Date().toISOString(),
+                updated_at: profileRow?.updated_at || new Date().toISOString(),
+              });
+            }
+          } catch {
+            if (isMounted) {
+              setProfile({
+                id: uid,
+                full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : authUser.user_metadata?.full_name || nameFromEmail(authUser.email || ''),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              });
+            }
+          }
+        } else if (isMounted) {
+          setUser(null);
+          setProfile(null);
+        }
+      } catch (err) {
+        console.warn('Falha na inicialização da autenticação:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    initSession();
+
+    if (isSupabaseConfigured()) {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session?.user) {
-          const isGlobalAdmin = session.user.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
-          const uid = session.user.id;
-          setUser({ id: uid, email: session.user.email || '' });
+          const authUser = session.user;
+          const isGlobalAdmin = authUser.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
+          const uid = authUser.id;
+
+          setUser({ id: uid, email: authUser.email || '' });
 
           try {
-            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
+            const { data: profileRow } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', uid)
+              .single();
+
             setProfile({
               id: uid,
-              full_name: profileRow?.full_name || session.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : 'Comerciante'),
-              avatar_url: profileRow?.avatar_url,
-              phone: profileRow?.phone,
+              full_name: profileRow?.full_name || authUser.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(authUser.email || '')),
+              avatar_url: profileRow?.avatar_url || authUser.user_metadata?.avatar_url,
+              phone: profileRow?.phone || authUser.user_metadata?.phone,
               created_at: profileRow?.created_at || new Date().toISOString(),
               updated_at: profileRow?.updated_at || new Date().toISOString(),
             });
           } catch {
             setProfile({
               id: uid,
-              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
+              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : authUser.user_metadata?.full_name || nameFromEmail(authUser.email || ''),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             });
           }
+        } else {
+          setUser(null);
+          setProfile(null);
         }
       });
 
-      return () => subscription.unsubscribe();
+      return () => {
+        isMounted = false;
+        subscription.unsubscribe();
+      };
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
-  const loginWithEmail = async (email: string, _pass: string) => {
+  const nameFromEmail = (email: string) => {
+    if (!email) return 'Usuário';
+    const namePart = email.split('@')[0];
+    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
+  };
+
+  const loginWithEmail = async (email: string, pass: string) => {
     setIsLoading(true);
-    const isGlobalAdmin = email.toLowerCase() === 'willian.o.jesus@gmail.com';
-
     try {
-      if (isSupabaseConfigured()) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password: _pass,
-        });
-
-        if (signInError) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password: _pass,
-            options: {
-              data: {
-                full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
-              },
-            },
-          });
-
-          if (signUpData?.user) {
-            const uid = signUpData.user.id;
-            setUser({ id: uid, email });
-            setProfile({
-              id: uid,
-              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            });
-            return;
-          }
-
-          if (signUpError && !isGlobalAdmin) {
-            throw signInError;
-          }
-        } else if (signInData?.user) {
-          const uid = signInData.user.id;
-          setUser({ id: uid, email: signInData.user.email || email });
-
-          try {
-            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
-            setProfile({
-              id: uid,
-              full_name: profileRow?.full_name || signInData.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email)),
-              avatar_url: profileRow?.avatar_url,
-              phone: profileRow?.phone,
-              created_at: profileRow?.created_at || new Date().toISOString(),
-              updated_at: profileRow?.updated_at || new Date().toISOString(),
-            });
-          } catch {
-            setProfile({
-              id: uid,
-              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            });
-          }
-          return;
-        }
+      if (!isSupabaseConfigured()) {
+        throw new Error('Supabase não configurado no ambiente.');
       }
 
-      // Fallback para modo offline / desenvolvimento
-      setUser({
-        id: isGlobalAdmin ? 'user-willian-global' : 'user-default',
-        email,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: pass,
       });
-      setProfile({
-        id: isGlobalAdmin ? 'user-willian-global' : 'user-default',
-        full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.user) {
+        const uid = data.user.id;
+        setUser({ id: uid, email: data.user.email || email });
+
+        try {
+          const { data: profileRow } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', uid)
+            .single();
+
+          setProfile({
+            id: uid,
+            full_name: profileRow?.full_name || data.user.user_metadata?.full_name || nameFromEmail(email),
+            avatar_url: profileRow?.avatar_url,
+            phone: profileRow?.phone,
+            created_at: profileRow?.created_at || new Date().toISOString(),
+            updated_at: profileRow?.updated_at || new Date().toISOString(),
+          });
+        } catch {
+          setProfile({
+            id: uid,
+            full_name: data.user.user_metadata?.full_name || nameFromEmail(email),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        }
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const nameFromEmail = (email: string) => {
-    const namePart = email.split('@')[0];
-    return namePart.charAt(0).toUpperCase() + namePart.slice(1);
-  };
-
-  const signupWithEmail = async (email: string, _pass: string, name: string) => {
+  const signupWithEmail = async (email: string, pass: string, name: string) => {
     setIsLoading(true);
     try {
-      if (isSupabaseConfigured()) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password: _pass,
-          options: { data: { full_name: name } },
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data?.user) {
-          const uid = data.user.id;
-          setUser({ id: uid, email: data.user.email || email });
-          setProfile({
-            id: uid,
-            full_name: name,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
-          return;
-        }
+      if (!isSupabaseConfigured()) {
+        throw new Error('Supabase não configurado no ambiente.');
       }
-      setUser({ id: 'user-default', email });
-      setProfile({
-        id: 'user-default',
-        full_name: name,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: pass,
+        options: {
+          data: {
+            full_name: name.trim(),
+          },
+        },
       });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.session && data?.user) {
+        const uid = data.user.id;
+        setUser({ id: uid, email: data.user.email || email });
+        setProfile({
+          id: uid,
+          full_name: name.trim(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      return {
+        user: data.user,
+        session: data.session,
+      };
     } finally {
       setIsLoading(false);
     }
@@ -214,27 +230,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = async () => {
     if (isSupabaseConfigured()) {
-      await supabase.auth.signInWithOAuth({ provider: 'google' });
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname,
+        },
+      });
     }
-    setUser({ id: 'user-willian-global', email: 'willian.o.jesus@gmail.com' });
-    setProfile({
-      id: 'user-willian-global',
-      full_name: 'Willian Oliveira (Global Admin)',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
   };
 
   const logout = async () => {
-    if (isSupabaseConfigured()) {
-      try {
+    setIsLoading(true);
+    try {
+      if (isSupabaseConfigured()) {
         await supabase.auth.signOut();
-      } catch {
-        // Ignora erros ao deslogar
       }
+    } catch (err) {
+      console.warn('Erro ao sair:', err);
+    } finally {
+      setUser(null);
+      setProfile(null);
+      setIsLoading(false);
     }
-    setUser(null);
-    setProfile(null);
   };
 
   return (
