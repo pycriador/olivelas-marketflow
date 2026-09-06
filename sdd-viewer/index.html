@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>MarketFlow — Docs SDD</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Ctext x='16' y='22' font-family='Arial,sans-serif' font-size='17' font-weight='700' fill='white' text-anchor='middle'%3ED%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">MF</div>
+        <div class="brand-text">
+          <strong>MarketFlow</strong>
+          <span>SDD / Especificações</span>
+        </div>
+      </div>
+
+      <div class="crumb" id="crumb">
+        <span class="crumb-dot">•</span>
+        <span id="crumb-doc" class="crumb-doc">Dashboard</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-btn" id="btn-theme" title="Tema (t)" aria-label="Alternar tema">◐</button>
+        <button class="icon-btn" id="btn-src" title="Abrir arquivo-fonte .md" aria-label="Abrir fonte">&lt;/&gt;</button>
+        <button class="icon-btn" id="btn-copy" title="Copiar markdown (c)" aria-label="Copiar markdown">⧉</button>
+        <button class="icon-btn" id="btn-print" title="Imprimir / PDF (p)" aria-label="Imprimir">⎙</button>
+      </div>
+    </header>
+
+    <div class="progress" id="progress"></div>
+
+    <div class="layout">
+
+      <aside class="sidebar">
+        <div class="sidebar-search">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M21 21l-5.2-5.2M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="search" type="search" placeholder="Buscar docs…  (/)"
+                 autocomplete="off" spellcheck="false" aria-label="Buscar documentos" />
+          <span class="search-hint">/</span>
+        </div>
+
+        <div class="sidebar-count" id="sidebar-count"></div>
+        <nav id="doc-list" class="doc-list" aria-label="Documentos"></nav>
+      </aside>
+
+      <main class="content" id="content">
+        <div class="home" id="home"></div>
+        <article class="article" id="article" hidden></article>
+        <div class="toast" id="toast" hidden></div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="Sumário">
+        <div class="toc-title">Neste documento</div>
+        <nav id="toc-nav"></nav>
+      </aside>
+
+    </div>
+
+    <footer class="footer" id="footer"></footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -25,7 +25,7 @@ const extract = (path, file) => {
   const lines = readFileSync(path, 'utf8').split(/\r?\n/)
   const content = lines.join('\n').trim() + '\n'
 
-  let title = file.replace(/\.md$/i, '')
+  let title = null
   const descParts = []
   const sections = []
   const secSlugs = new Set()
@@ -41,8 +41,9 @@ const extract = (path, file) => {
     }
 
     const heading = /^(#{1,6})\s+(.*)$/.exec(line)
+    const wrapper = /^"[^"]+\.md"\s*:\s*"""\s*#\s+(.+)$/.exec(line)
     if (heading) {
-      if (title === file.replace(/\.md$/i, '') || descParts.length === 0) {
+      if (title === null) {
         title = heading[2].trim()
         continue
       }
@@ -51,12 +52,15 @@ const extract = (path, file) => {
         title: heading[2].trim(),
         id: slugify(heading[2].trim(), secSlugs),
       })
-      descParts.length = 0
+      continue
+    }
+    if (title === null && wrapper) {
+      title = wrapper[1].trim()
       continue
     }
 
     if (inFence) continue
-    descParts.push(line)
+    if (sections.length === 0) descParts.push(line)
   }
 
   const words = content.match(/[A-Za-zÀ-ú0-9_]+/g)?.length ?? 0
