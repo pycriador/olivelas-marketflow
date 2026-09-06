@@ -143,6 +143,7 @@ export const App: React.FC = () => {
           productId={prodId}
           onBackToAdmin={() => navigate('/admin/dashboard')}
           onNavigateBasket={() => navigate(`/loja/${storeSlug}/cesta`)}
+          onNavigateStore={(newSlug) => navigate(`/loja/${newSlug}`)}
           onSelectProduct={(p) => navigate(`/loja/${storeSlug}/produto/${p.id}`)}
           onCloseProduct={() => navigate(`/loja/${storeSlug}`)}
         />
@@ -156,7 +157,9 @@ export const App: React.FC = () => {
     if (isBasket) {
       return (
         <BasketBuilderPage
+          slug={slug}
           onBackToStore={() => navigate(`/loja/${slug}`)}
+          onNavigateStore={(newSlug) => navigate(`/loja/${newSlug}/cesta`)}
         />
       );
     }
@@ -166,6 +169,7 @@ export const App: React.FC = () => {
         slug={slug}
         onBackToAdmin={() => navigate('/admin/dashboard')}
         onNavigateBasket={() => navigate(`/loja/${slug}/cesta`)}
+        onNavigateStore={(newSlug) => navigate(`/loja/${newSlug}`)}
         onSelectProduct={(p) => navigate(`/loja/${slug}/produto/${p.id}`)}
         onCloseProduct={() => navigate(`/loja/${slug}`)}
       />

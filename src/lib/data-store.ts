@@ -16,6 +16,7 @@ import {
   getRealBrands,
   getRealProducts
 } from './real-basket-data';
+import { mockCompanies } from './supabase';
 
 // Chaves de armazenamento persistente no localStorage
 const STORAGE_KEYS = {
@@ -230,6 +231,36 @@ function saveToStorage<T>(key: string, data: T): void {
 
 // SINGLETON CENTRAL DE DADOS
 class DataStore {
+  // EMPRESAS / LOJAS
+  getCompanies(): Company[] {
+    return loadFromStorage<Company[]>(STORAGE_KEYS.COMPANIES, mockCompanies);
+  }
+
+  getCompanyBySlug(slug: string): Company | undefined {
+    const all = this.getCompanies();
+    return all.find(c => c.slug === slug || c.id === slug);
+  }
+
+  getCompanyById(id: string): Company | undefined {
+    const all = this.getCompanies();
+    return all.find(c => c.id === id);
+  }
+
+  saveCompany(company: Company): Company {
+    const all = this.getCompanies();
+    const index = all.findIndex(c => c.id === company.id);
+    let updated: Company[];
+    const now = new Date().toISOString();
+    if (index >= 0) {
+      all[index] = { ...all[index], ...company, updated_at: now };
+      updated = [...all];
+    } else {
+      updated = [{ ...company, created_at: now, updated_at: now }, ...all];
+    }
+    saveToStorage(STORAGE_KEYS.COMPANIES, updated);
+    return company;
+  }
+
   // PRODUTOS
   getProducts(companyId?: string): Product[] {
     const all = loadFromStorage<Product[]>(STORAGE_KEYS.PRODUCTS, initialProducts);
