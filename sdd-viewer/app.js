@@ -79,16 +79,11 @@ let __sdk = {};
       { cls: 'f', re: /[A-Za-z_$][\w$]*(?=\s*\()/g }
     );
 
-    const esc = escapeHtml(code);
-
-    // Tokenize by slices: repeatedly find the earliest pattern match.
-    let result = '';
-    let pos = 0;
     const tokens = [];
     for (const p of patterns) {
       let m;
       p.re.lastIndex = 0;
-      while ((m = p.re.exec(esc))) {
+      while ((m = p.re.exec(code))) {
         tokens.push({ start: m.index, end: m.index + m[0].length, cls: p.cls });
       }
     }
@@ -108,13 +103,16 @@ let __sdk = {};
       clean.push(t);
     }
 
+    // Emit: gaps are escaped, tokens are escaped and wrapped (tokenize raw, escape per slice).
+    let result = '';
+    let pos = 0;
     for (const t of clean) {
       if (t.start < pos) continue;
-      result += esc.slice(pos, t.start);
-      result += `<span class="tok-${t.cls}">${esc.slice(t.start, t.end)}</span>`;
+      result += escapeHtml(code.slice(pos, t.start));
+      result += `<span class="tok-${t.cls}">${escapeHtml(code.slice(t.start, t.end))}</span>`;
       pos = t.end;
     }
-    result += esc.slice(pos);
+    result += escapeHtml(code.slice(pos));
     return result;
   }
 
@@ -233,7 +231,9 @@ let __sdk = {};
 
       // table
       if (isTable(i, lines)) {
-        out.push(renderTable(i, lines));
+        const tbl = renderTable(i, lines);
+        out.push(tbl.html);
+        i = tbl.next;
         continue;
       }
 
@@ -319,7 +319,7 @@ let __sdk = {};
       return `<tr>${tds}</tr>`;
     }).join('');
 
-    return `<table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
+    return { html: `<table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`, next: i };
   }
 
   function consumeList(lines, start) {
