@@ -9,6 +9,7 @@ import { useCompany } from '../../../context/company-context';
 import { AppRole, CompanyUser } from '../../../types';
 import { DropdownFilterMenu } from '../../../components/ui/dropdown-filter-menu';
 import { Search } from 'lucide-react';
+import { usersService } from '../../../services/api';
 
 export const UserListPage: React.FC<{ onNavigate?: (path: string) => void }> = ({ onNavigate }) => {
   const { currentCompany, currentRole } = useCompany();
@@ -16,7 +17,7 @@ export const UserListPage: React.FC<{ onNavigate?: (path: string) => void }> = (
   const [members, setMembers] = useState<CompanyUser[]>([
     {
       id: 'cu-1',
-      company_id: currentCompany?.id || 'comp-1',
+      company_id: currentCompany?.id || 'comp-cesta-1',
       user_id: 'user-default',
       role: 'admin',
       active: true,
@@ -25,28 +26,22 @@ export const UserListPage: React.FC<{ onNavigate?: (path: string) => void }> = (
       profile: {
         id: 'user-default',
         full_name: 'Willian Oliveira (Você)',
-        phone: '(11) 99999-8888',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    },
-    {
-      id: 'cu-2',
-      company_id: currentCompany?.id || 'comp-1',
-      user_id: 'user-maria',
-      role: 'stock',
-      active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      profile: {
-        id: 'user-maria',
-        full_name: 'Maria Estoquista',
-        phone: '(11) 97777-6666',
+        phone: '(11) 96382-0374',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
     },
   ]);
+
+  React.useEffect(() => {
+    if (currentCompany?.id) {
+      usersService.fetchCompanyUsers(currentCompany.id).then(remoteMembers => {
+        if (remoteMembers && remoteMembers.length > 0) {
+          setMembers(remoteMembers);
+        }
+      }).catch(err => console.warn('Supabase fetchCompanyUsers error:', err));
+    }
+  }, [currentCompany?.id]);
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -88,29 +83,26 @@ export const UserListPage: React.FC<{ onNavigate?: (path: string) => void }> = (
     return matchesSearch && matchesRole;
   });
 
-  const handleInvite = (e: React.FormEvent) => {
+  const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
 
-    const newMember: CompanyUser = {
-      id: `cu-${Date.now()}`,
-      company_id: currentCompany?.id || 'comp-1',
-      user_id: `user-${Date.now()}`,
-      role: inviteRole,
-      active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      profile: {
-        id: `user-${Date.now()}`,
-        full_name: inviteEmail.split('@')[0],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    };
+    const newMember = await usersService.addCompanyUser(
+      currentCompany?.id || 'comp-cesta-1',
+      inviteEmail,
+      inviteRole
+    );
 
     setMembers(prev => [...prev, newMember]);
     setInviteEmail('');
     setIsInviteModalOpen(false);
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (window.confirm('Tem certeza que deseja remover este usuário da empresa?')) {
+      await usersService.removeUser(memberId);
+      setMembers(prev => prev.filter(m => m.id !== memberId));
+    }
   };
 
   const getRoleBadge = (role: AppRole) => {
@@ -210,8 +202,19 @@ export const UserListPage: React.FC<{ onNavigate?: (path: string) => void }> = (
                     <p className="text-xs text-muted-foreground">{m.profile?.phone || 'Sem telefone registrado'}</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                   {getRoleBadge(m.role)}
+                  {members.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveMember(m.id)}
+                      className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
+                      title="Remover da empresa"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

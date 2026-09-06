@@ -32,29 +32,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (isSupabaseConfigured()) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
         if (session?.user) {
           const isGlobalAdmin = session.user.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
-          setUser({ id: session.user.id, email: session.user.email || '' });
-          setProfile({
-            id: session.user.id,
-            full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+          const uid = session.user.id;
+          setUser({ id: uid, email: session.user.email || '' });
+
+          try {
+            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
+            setProfile({
+              id: uid,
+              full_name: profileRow?.full_name || session.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : 'Comerciante'),
+              avatar_url: profileRow?.avatar_url,
+              phone: profileRow?.phone,
+              created_at: profileRow?.created_at || new Date().toISOString(),
+              updated_at: profileRow?.updated_at || new Date().toISOString(),
+            });
+          } catch {
+            setProfile({
+              id: uid,
+              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
         }
       });
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
         if (session?.user) {
           const isGlobalAdmin = session.user.email?.toLowerCase() === 'willian.o.jesus@gmail.com';
-          setUser({ id: session.user.id, email: session.user.email || '' });
-          setProfile({
-            id: session.user.id,
-            full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+          const uid = session.user.id;
+          setUser({ id: uid, email: session.user.email || '' });
+
+          try {
+            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
+            setProfile({
+              id: uid,
+              full_name: profileRow?.full_name || session.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : 'Comerciante'),
+              avatar_url: profileRow?.avatar_url,
+              phone: profileRow?.phone,
+              created_at: profileRow?.created_at || new Date().toISOString(),
+              updated_at: profileRow?.updated_at || new Date().toISOString(),
+            });
+          } catch {
+            setProfile({
+              id: uid,
+              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : session.user.user_metadata?.full_name || 'Comerciante',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
         }
       });
 
@@ -68,14 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       if (isSupabaseConfigured()) {
-        // Tenta login com a senha no Supabase
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password: _pass,
         });
 
         if (signInError) {
-          // Se o usuário ainda não existe no Supabase remoto, realiza o Auto-Signup no Supabase
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password: _pass,
@@ -86,14 +112,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             },
           });
 
-          // Se conseguiu cadastrar no Supabase ou se email confirmation está ativo, autentica sessão local
+          if (signUpData?.user) {
+            const uid = signUpData.user.id;
+            setUser({ id: uid, email });
+            setProfile({
+              id: uid,
+              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+            return;
+          }
+
           if (signUpError && !isGlobalAdmin) {
             throw signInError;
           }
+        } else if (signInData?.user) {
+          const uid = signInData.user.id;
+          setUser({ id: uid, email: signInData.user.email || email });
+
+          try {
+            const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', uid).single();
+            setProfile({
+              id: uid,
+              full_name: profileRow?.full_name || signInData.user.user_metadata?.full_name || (isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email)),
+              avatar_url: profileRow?.avatar_url,
+              phone: profileRow?.phone,
+              created_at: profileRow?.created_at || new Date().toISOString(),
+              updated_at: profileRow?.updated_at || new Date().toISOString(),
+            });
+          } catch {
+            setProfile({
+              id: uid,
+              full_name: isGlobalAdmin ? 'Willian Oliveira (Global Admin)' : nameFromEmail(email),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
+          return;
         }
       }
 
-      // Garante sessão autenticada com os privilégios corretos do usuário
+      // Fallback para modo offline / desenvolvimento
       setUser({
         id: isGlobalAdmin ? 'user-willian-global' : 'user-default',
         email,
@@ -118,11 +178,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       if (isSupabaseConfigured()) {
-        await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password: _pass,
           options: { data: { full_name: name } },
         });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data?.user) {
+          const uid = data.user.id;
+          setUser({ id: uid, email: data.user.email || email });
+          setProfile({
+            id: uid,
+            full_name: name,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+          return;
+        }
       }
       setUser({ id: 'user-default', email });
       setProfile({

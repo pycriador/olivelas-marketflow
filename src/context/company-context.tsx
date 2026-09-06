@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Company, CompanyUser, AppRole } from '../types';
 import { mockCompanies, mockUserCompanies } from '../lib/supabase';
 import { useAuth } from './auth-context';
+import { companiesService } from '../services/api';
 
 const LOCAL_ALL_COMPANIES_KEY = 'marketflow_all_companies';
 
@@ -55,6 +56,21 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem(LOCAL_ALL_COMPANIES_KEY, JSON.stringify(allCompanies));
   }, [allCompanies]);
+
+  useEffect(() => {
+    companiesService.fetchCompanies().then(remoteList => {
+      if (remoteList && remoteList.length > 0) {
+        setAllCompanies(prev => {
+          const map = new Map<string, Company>();
+          remoteList.forEach(c => map.set(c.id, c));
+          prev.forEach(c => {
+            if (!map.has(c.id)) map.set(c.id, c);
+          });
+          return Array.from(map.values());
+        });
+      }
+    }).catch(err => console.warn('Supabase fetchCompanies error:', err));
+  }, []);
 
   useEffect(() => {
     if (allCompanies.length > 0 && !allCompanies.some(c => c.id === currentCompanyId)) {
@@ -128,6 +144,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setCurrentCompanyId(newComp.id);
     localStorage.setItem('marketflow-active-company', newComp.id);
 
+    // Persiste no Supabase
+    await companiesService.saveCompany(newComp).catch(err => console.warn('Supabase saveCompany error:', err));
+
     return newComp;
   };
 
@@ -157,12 +176,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
 
     if (!updated) throw new Error('Empresa não encontrada.');
+
+    // Persiste no Supabase
+    await companiesService.saveCompany(updated).catch(err => console.warn('Supabase saveCompany error:', err));
+
     return updated;
   };
 
   const deleteCompany = async (companyId: string): Promise<void> => {
     setAllCompanies(prev => prev.filter(c => c.id !== companyId));
     setUserCompanies(prev => prev.filter(cu => cu.company_id !== companyId));
+    await companiesService.deleteCompany(companyId).catch(err => console.warn('Supabase deleteCompany error:', err));
   };
 
   const toggleBreakfastBasket = async (companyId: string, enabled: boolean): Promise<void> => {

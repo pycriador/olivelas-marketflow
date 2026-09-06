@@ -17,6 +17,14 @@ import {
   getRealProducts
 } from './real-basket-data';
 import { mockCompanies } from './supabase';
+import {
+  companiesService,
+  productsService,
+  categoriesService,
+  brandsService,
+  inventoryService,
+  catalogService
+} from '../services/api';
 
 // Chaves de armazenamento persistente no localStorage
 const STORAGE_KEYS = {
@@ -251,14 +259,19 @@ class DataStore {
     const index = all.findIndex(c => c.id === company.id);
     let updated: Company[];
     const now = new Date().toISOString();
+    let savedCompany: Company;
     if (index >= 0) {
-      all[index] = { ...all[index], ...company, updated_at: now };
+      savedCompany = { ...all[index], ...company, updated_at: now };
+      all[index] = savedCompany;
       updated = [...all];
     } else {
-      updated = [{ ...company, created_at: now, updated_at: now }, ...all];
+      savedCompany = { ...company, created_at: now, updated_at: now };
+      updated = [savedCompany, ...all];
     }
     saveToStorage(STORAGE_KEYS.COMPANIES, updated);
-    return company;
+    // Persiste no Supabase assincronamente
+    companiesService.saveCompany(savedCompany).catch(err => console.warn('Supabase saveCompany error:', err));
+    return savedCompany;
   }
 
   // PRODUTOS
@@ -301,27 +314,30 @@ class DataStore {
     const index = all.findIndex(p => p.id === product.id);
     let updatedList: Product[];
     const now = new Date().toISOString();
+    let savedProd: Product;
 
     if (index >= 0) {
       const existing = all[index];
-      const updated: Product = { ...existing, ...product, updated_at: now };
+      savedProd = { ...existing, ...product, updated_at: now };
       updatedList = [...all];
-      updatedList[index] = updated;
+      updatedList[index] = savedProd;
       saveToStorage(STORAGE_KEYS.PRODUCTS, updatedList);
-      return updated;
     } else {
-      const newProduct: Product = {
+      savedProd = {
         ...product,
         created_at: product.created_at || now,
         updated_at: now,
       };
-      updatedList = [newProduct, ...all];
+      updatedList = [savedProd, ...all];
       saveToStorage(STORAGE_KEYS.PRODUCTS, updatedList);
 
       // Garante criação automática do item de estoque para o novo produto
-      this.ensureInventoryItem(newProduct);
-      return newProduct;
+      this.ensureInventoryItem(savedProd);
     }
+
+    // Persiste no Supabase assincronamente
+    productsService.saveProduct(savedProd).catch(err => console.warn('Supabase saveProduct error:', err));
+    return savedProd;
   }
 
   deleteProduct(id: string): boolean {
@@ -329,6 +345,8 @@ class DataStore {
     const filtered = all.filter(p => p.id !== id);
     if (filtered.length !== all.length) {
       saveToStorage(STORAGE_KEYS.PRODUCTS, filtered);
+      // Remove do Supabase assincronamente
+      productsService.deleteProduct(id).catch(err => console.warn('Supabase deleteProduct error:', err));
       return true;
     }
     return false;
@@ -413,6 +431,7 @@ class DataStore {
     const all = this.getMovements();
     const updated = [mov, ...all];
     saveToStorage(STORAGE_KEYS.MOVEMENTS, updated);
+    inventoryService.addMovement(mov).catch(err => console.warn('Supabase addMovement error:', err));
     return mov;
   }
 
@@ -428,16 +447,19 @@ class DataStore {
     const index = all.findIndex(l => l.id === lot.id);
     let updated: Lot[];
     const now = new Date().toISOString();
+    let savedLot: Lot;
 
     if (index >= 0) {
-      all[index] = { ...all[index], ...lot, updated_at: now };
+      savedLot = { ...all[index], ...lot, updated_at: now };
+      all[index] = savedLot;
       updated = [...all];
     } else {
-      const newLot: Lot = { ...lot, created_at: now, updated_at: now };
-      updated = [newLot, ...all];
+      savedLot = { ...lot, created_at: now, updated_at: now };
+      updated = [savedLot, ...all];
     }
     saveToStorage(STORAGE_KEYS.LOTS, updated);
-    return lot;
+    inventoryService.saveLot(savedLot).catch(err => console.warn('Supabase saveLot error:', err));
+    return savedLot;
   }
 
   // CATEGORIAS
@@ -452,15 +474,19 @@ class DataStore {
     const index = all.findIndex(c => c.id === category.id);
     let updated: Category[];
     const now = new Date().toISOString();
+    let savedCat: Category;
 
     if (index >= 0) {
-      all[index] = { ...all[index], ...category, updated_at: now };
+      savedCat = { ...all[index], ...category, updated_at: now };
+      all[index] = savedCat;
       updated = [...all];
     } else {
-      updated = [{ ...category, created_at: now, updated_at: now }, ...all];
+      savedCat = { ...category, created_at: now, updated_at: now };
+      updated = [savedCat, ...all];
     }
     saveToStorage(STORAGE_KEYS.CATEGORIES, updated);
-    return category;
+    categoriesService.saveCategory(savedCat).catch(err => console.warn('Supabase saveCategory error:', err));
+    return savedCat;
   }
 
   // MARCAS
@@ -475,15 +501,19 @@ class DataStore {
     const index = all.findIndex(b => b.id === brand.id);
     let updated: Brand[];
     const now = new Date().toISOString();
+    let savedBrand: Brand;
 
     if (index >= 0) {
-      all[index] = { ...all[index], ...brand, updated_at: now };
+      savedBrand = { ...all[index], ...brand, updated_at: now };
+      all[index] = savedBrand;
       updated = [...all];
     } else {
-      updated = [{ ...brand, created_at: now, updated_at: now }, ...all];
+      savedBrand = { ...brand, created_at: now, updated_at: now };
+      updated = [savedBrand, ...all];
     }
     saveToStorage(STORAGE_KEYS.BRANDS, updated);
-    return brand;
+    brandsService.saveBrand(savedBrand).catch(err => console.warn('Supabase saveBrand error:', err));
+    return savedBrand;
   }
 
   // FABRICANTES
@@ -552,7 +582,45 @@ class DataStore {
       updated = [{ ...req, created_at: now, updated_at: now }, ...all];
     }
     saveToStorage(STORAGE_KEYS.REQUESTS, updated);
+    catalogService.createRequest(req).catch(err => console.warn('Supabase createRequest error:', err));
     return req;
+  }
+
+  // SINCRONIZAÇÃO COMPLETA COM BANCO DE DADOS REMOTO (SUPABASE)
+  async syncWithRemote(): Promise<void> {
+    try {
+      const [remoteCompanies, remoteProducts, remoteCategories, remoteBrands, remoteLots, remoteInventory] = await Promise.all([
+        companiesService.fetchCompanies().catch(() => []),
+        productsService.fetchProducts().catch(() => []),
+        categoriesService.fetchCategories().catch(() => []),
+        brandsService.fetchBrands().catch(() => []),
+        inventoryService.fetchLots().catch(() => []),
+        inventoryService.fetchInventory().catch(() => []),
+      ]);
+
+      if (remoteCompanies.length > 0) {
+        saveToStorage(STORAGE_KEYS.COMPANIES, remoteCompanies);
+      }
+      if (remoteProducts.length > 0) {
+        saveToStorage(STORAGE_KEYS.PRODUCTS, remoteProducts);
+      }
+      if (remoteCategories.length > 0) {
+        saveToStorage(STORAGE_KEYS.CATEGORIES, remoteCategories);
+      }
+      if (remoteBrands.length > 0) {
+        saveToStorage(STORAGE_KEYS.BRANDS, remoteBrands);
+      }
+      if (remoteLots.length > 0) {
+        saveToStorage(STORAGE_KEYS.LOTS, remoteLots);
+      }
+      if (remoteInventory.length > 0) {
+        saveToStorage(STORAGE_KEYS.INVENTORY, remoteInventory);
+      }
+
+      console.info('MarketFlow DataStore: Sincronização remota com Supabase executada.');
+    } catch (err) {
+      console.warn('MarketFlow DataStore: Falha ao sincronizar com Supabase:', err);
+    }
   }
 }
 

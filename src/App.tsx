@@ -76,8 +76,11 @@ export const App: React.FC = () => {
     return null;
   });
 
-  // Sincronização bidirecional com o histórico de navegação do browser (URL)
+  // Sincronização bidirecional com o histórico de navegação do browser (URL) e sync com Supabase
   React.useEffect(() => {
+    // Sincroniza dados com o Supabase em background
+    dataStore.syncWithRemote();
+
     const handlePopState = () => {
       const appPath = (getAppPath(window.location.pathname) || '/admin/dashboard').split('?')[0];
       setCurrentPath(appPath);
