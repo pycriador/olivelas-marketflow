@@ -3,7 +3,7 @@ title: "MarketFlow — Authentication"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -16,19 +16,25 @@ version: "1.0"
 >
 > Documentation Standard v1.0
 
-Source: [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md). Proposed state (not implemented).
+Source: [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md). Partially implemented (frontend prototype wires Supabase Auth client; full backend flows pending).
 
 ## Purpose
 
-Define how users prove identity in MarketFlow: providers, principles and responsibilities over credentials and sessions.
+Define how users (human) and integrators (machine) prove identity in MarketFlow: providers, principles and responsibilities over credentials and sessions. Machine authentication (API Keys) is covered here only as a reference — details in [contracts/api.md](../contracts/api.md) and [ADR-008](../decisions/adr-008-api-first-and-api-keys.md).
 
-## Entry point (mechanism)
+## Entry point (mechanism) — human
 
 | Entry point | Mechanism | Classification |
 | --- | --- | --- |
 | Registration / login | Supabase Auth — email + password | Confirmed (SDD) |
 | Registration / login | Supabase Auth — Google OAuth | Confirmed (SDD) |
 | Session | Session tokens managed by Supabase Auth | Confirmed (SDD) |
+
+## Entry point (mechanism) — machine
+
+| Entry point | Mechanism | Classification |
+| --- | --- | --- |
+| API access | API Keys `mf_live_...` / `mf_test_...` (bearer) | Confirmed (SDD) — ADR-008 |
 
 ## Providers — MVP
 
@@ -42,7 +48,7 @@ Define how users prove identity in MarketFlow: providers, principles and respons
 | OIDC | Future | — |
 | SAML | Future (enterprise) | — |
 
-OAuth secrets live in secure provider configuration (never in the frontend).
+OAuth secrets live in secure provider configuration (never in the frontend). API Keys are hashed at rest (`secret_hash`) and shown in full only once, at creation.
 
 ## MFA
 
@@ -72,14 +78,14 @@ OAuth secrets live in secure provider configuration (never in the frontend).
 | --- | --- | --- |
 | Supabase Auth | Identity, sessions, providers, hashing | Confirmed (SDD) |
 | Frontend | Redirects, session states, error capture | Confirmed (SDD) |
-| Edge Functions | Token validation in privileged operations | Confirmed (SDD) |
+| Edge Functions / API layer | Token validation in privileged operations; API Key hash + status check | Confirmed (SDD) |
 | PostgreSQL/RLS | Never trusts `user_id`/`company_id` from the client | Confirmed (SDD) |
 
 ## Related documentation
 
 | Document | Path |
 | --- | --- |
-| Authorization (RBAC) | [authorization.md](authorization.md) |
+| Authorization (RBAC + scopes) | [authorization.md](authorization.md) |
 | Security (overall posture) | [security.md](security.md) |
-| Contracts | [contracts/api.md](../contracts/api.md) |
+| Contracts (API Keys) | [contracts/api.md](../contracts/api.md) |
 | Full source | [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md) |

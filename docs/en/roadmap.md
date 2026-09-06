@@ -3,7 +3,7 @@ title: "MarketFlow — Roadmap"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -16,7 +16,7 @@ version: "1.0"
 >
 > Documentation Standard v1.0
 
-Source: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md) and backlog items in [`sdd/10-FULL-SYSTEM.md`](../../sdd/10-FULL-SYSTEM.md).
+Source: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), backlog items in [`sdd/10-FULL-SYSTEM.md`](../../sdd/10-FULL-SYSTEM.md), [`sdd/11-EXTRAS.md`](../../sdd/11-EXTRAS.md) and [`sdd/12-EXTRAS.md`](../../sdd/12-EXTRAS.md).
 
 ## Evolution principles
 
@@ -36,24 +36,25 @@ Source: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md) and backlog items in [`sd
 
 ## MVP (P0)
 
-Source: `sdd/06-ROADMAP.md` and backlog `29-BACKLOG`.
+Source: `sdd/06-ROADMAP.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` and backlog `29-BACKLOG`.
 
 - Landing page.
 - Auth (email+password + Google OAuth) and first company creation.
 - Multi-company and company switching.
-- IAM/RBAC (GLOBAL_ADMIN, ADMIN, STOCK, VISITOR).
-- Categories, brands, manufacturers, suppliers.
+- IAM/RBAC (GLOBAL_ADMIN, ADMIN, STOCK, VISITOR) + full user management (invites, roles, list).
+- Categories, brands, manufacturers, suppliers (full CRUD).
 - Products (CRUD, images, cost/sale/promo price, SKU/barcode, units).
-- Basic inventory (entry, exit, adjustment, loss, count, history).
-- Lots and expiry.
-- Public catalog (product publishing, company slug).
-- Basic catalog requests.
-- AI product registration (photo → data + confidence → human review → save).
+- Basic inventory (entry, exit, adjustment, loss, count, history) and lots/expiry.
+- Public catalog (product publishing, company slug) and catalog requests.
+- 20 themes (10 light / 10 dark) and language selection (pt-BR/EN/ES) persisted per user.
+- AI product registration (photo → data + confidence → human review → save) with AI Service abstraction.
+- WhatsApp configuration: per-company message templates, variables, preview, history and retry.
+- Developer area: API Keys (`mf_live_`/`mf_test_`) with scopes; OpenAPI docs.
 - In-app notifications (low stock, expiry, invitations, requests).
 
 ## Security P0/P1
 
-- P0: Supabase Auth, RLS, tenant isolation, RBAC, backend authorization, secure Storage, input validation, output filtering, secrets, HTTPS, basic rate limiting, audit logs for critical operations, inventory and public catalog protection, AI quota, cross-tenant and IDOR/BOLA tests.
+- P0: Supabase Auth, RLS, tenant isolation, RBAC, backend authorization, secure Storage, input validation, output filtering, secrets, HTTPS, basic rate limiting, audit logs for critical operations, inventory and public catalog protection, AI quota, API Key hashing/scopes, cross-tenant and IDOR/BOLA tests.
 - P1: security headers, CSP, monitoring, dependency scanning, backup/recovery, abuse detection, security alerts, advanced AI cost controls.
 - P2 (future): MFA, custom roles, ABAC, SSO/SAML/OIDC, IP allowlist, advanced threat detection, advanced LGPD workflows.
 
@@ -65,6 +66,8 @@ MVP security acceptance criteria in `sdd/08-SECURITY.md`.
 - Observability improvements (structured logs, metrics, alerts).
 - P1 security (above).
 - AI efficiency and cost optimization.
+- Webhooks delivery hardening and developer docs.
+- Complete migration coverage (RLS policies, triggers/functions, `plan_limits`, catalog tables).
 
 ## P2 — Evolution
 
@@ -77,9 +80,9 @@ MVP security acceptance criteria in `sdd/08-SECURITY.md`.
 - Tax/fiscal.
 - Finance.
 - Branches.
-- Public API for third parties.
+- GraphQL or other API versions over the API-first base.
 - Automations and AI Copilot.
-- Multi-channel notifications (email, WhatsApp, push).
+- Email/push notifications (WhatsApp is in scope).
 - Online billing/payments (gateway + webhooks).
 - Enterprise features (SSO, SAML, OIDC, IP allowlist, advanced reports).
 
@@ -94,4 +97,5 @@ Analyze all project documents before creating tasks. Identify dependencies, gaps
 | Project overview | [project-overview.md](project-overview.md) |
 | Security (priorities) | [security/security.md](security/security.md) |
 | Monetization | [decisions/adr-006-monetization-free-first.md](decisions/adr-006-monetization-free-first.md) |
-| Source | [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), [`sdd/07-MONETIZATION.md`](../../sdd/07-MONETIZATION.md) |
+| API First | [decisions/adr-008-api-first-and-api-keys.md](decisions/adr-008-api-first-and-api-keys.md) |
+| Source | [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), [`sdd/07-MONETIZATION.md`](../../sdd/07-MONETIZATION.md), [`sdd/11-EXTRAS.md`](../../sdd/11-EXTRAS.md), [`sdd/12-EXTRAS.md`](../../sdd/12-EXTRAS.md) |

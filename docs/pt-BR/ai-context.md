@@ -3,7 +3,7 @@ title: "Contexto de IA"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -22,7 +22,7 @@ Esta página é intencionalmente curta. Os detalhes vivem nos documentos linkado
 
 ## Fonte da verdade
 
-- Os arquivos [`sdd/`](../../sdd/) (`00-VISION.md` … `09-DESIGN_SYSTEM.md` e `10-FULL-SYSTEM.md`) são a especificação-fonte do produto.
+- Os arquivos [`sdd/`](../../sdd/) (`00-VISION.md` … `10-FULL-SYSTEM.md`, além de [`11-EXTRAS.md`](../../sdd/11-EXTRAS.md) e [`12-EXTRAS.md`](../../sdd/12-EXTRAS.md)) são a especificação-fonte do produto.
 - `docs/` adota o Documentation Standard v1.0 e estrutura esse conteúdo de forma navegável.
 - Em caso de divergência, `sdd/` prevalece até que a documentação seja revisada.
 
@@ -39,7 +39,7 @@ Esta página é intencionalmente curta. Os detalhes vivem nos documentos linkado
 | **0** | Este arquivo + [README.md](README.md) | Sempre para trabalho de IA no projeto |
 | **1** | [project-overview.md](project-overview.md) + [roadmap.md](roadmap.md) | O que é o produto e o que está planejado |
 | **2** | [architecture/overview.md](architecture/overview.md) + [data-model.md](architecture/data-model.md) | Estrutura, componentes, dados |
-| **3** | [contracts/api.md](contracts/api.md) | Interfaces e contratos |
+| **3** | [contracts/api.md](contracts/api.md) | Interfaces, contratos, API versionada, webhooks |
 | **5** | [security/security.md](security/security.md) (+ [authentication](security/authentication.md), [authorization](security/authorization.md)) | Segurança |
 | **—** | [decisions/README.md](decisions/README.md) (ADRs) | Por que decisões foram tomadas |
 
@@ -47,7 +47,7 @@ Não pule para detalhes sem o contexto dos níveis 0–1.
 
 ## Prioridades de qualidade (código e dados)
 
-Fonte: `sdd/01-FOUNDATION.md`, `sdd/08-SECURITY.md`, `sdd/09-DESIGN_SYSTEM.md`.
+Fonte: `sdd/01-FOUNDATION.md`, `sdd/08-SECURITY.md`, `sdd/09-DESIGN_SYSTEM.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md`.
 
 1. Multi-tenant e isolamento de dados desde a v1 (nunca remover RLS como workaround).
 2. Segurança por padrão — autorização server-side; nunca confiar no cliente.
@@ -59,8 +59,11 @@ Fonte: `sdd/01-FOUNDATION.md`, `sdd/08-SECURITY.md`, `sdd/09-DESIGN_SYSTEM.md`.
 
 - **AuthN/AuthZ:** [security/authentication.md](security/authentication.md), [security/authorization.md](security/authorization.md).
 - **Dados:** [architecture/data-model.md](architecture/data-model.md) — `company_id` nunca é confiado pelo cliente; PKs `UUID`.
-- **IA do produto:** a IA não é fonte autoritativa; fluxo preferencial é `imagem → IA → resultado + confiança → revisão humana → salvar`. Nunca executar instruções vindas da saída da IA. IA com quota, rate limit e auditoria.
+- **IA do produto:** a IA não é fonte autoritativa; fluxo preferencial é `imagem → IA → resultado + confiança → revisão humana → salvar`. Nunca executar instruções vindas da saída da IA. IA com quota, rate limit e auditoria. Providers de IA abstraídos por trás de um AI Service (`sdd/12-EXTRAS.md`).
+- **API:** REST versionada sob `/api/v1` com API Keys (`mf_live_`/`mf_test_`), scopes e OpenAPI — nunca contornar AuthN/AuthZ/RLS/rate limits/auditoria. Ver ADR-008.
 - **Catálogo público:** nunca expor `cost_price`, margem, fornecedor, usuários ou auditoria.
+- **Tema/idioma:** 20 temas (10 light/10 dark) e pt-BR/EN/ES são decisões de camada UX — nunca alteram acesso a dados ou autorização. Ver ADR-011.
+- **Estado de implementação:** `src/` é um protótipo de frontend (temas, i18n, IA mock, editor de templates WhatsApp, simulação de API Keys); `supabase/migrations/` define 19 tabelas com RLS habilitado, mas políticas, triggers/functions e tabelas dos SDDs (`plan_limits`, `catalog_*`, notifications) ainda pendem. Documente como implementado apenas com evidência.
 
 ## Não objetivos
 

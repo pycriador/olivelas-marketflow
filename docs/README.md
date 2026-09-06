@@ -25,17 +25,17 @@ Cada ramo de idioma contém:
 ├── ai-context.md        # Ponto de entrada para IA/agentes
 ├── project-overview.md  # Propósito, escopo e mapa do sistema (00-VISION)
 ├── roadmap.md           # Roadmap e prioridades (06-ROADMAP)
-├── architecture/
+─ architecture/
 │   ├── overview.md      # Visão geral de arquitetura (01-FOUNDATION)
-│   └── data-model.md    # Modelo de dados (02-DATABASE)
+│   └── data-model.md    # Modelo de dados (02-DATABASE, 12-EXTRAS)
 ├── contracts/
-│   └── api.md           # Contrato da superfície de API (05-API)
+│   └── api.md           # Contrato da superfície de API (05-API, 12-EXTRAS)
 ├── security/
-│   ├── security.md      # Postura de segurança (08-SECURITY)
+│   ├── security.md      # Postura de segurança (08-SECURITY, 12-EXTRAS)
 │   ├── authentication.md# Autenticação (03-AUTH)
-│   └── authorization.md # Autorização / RBAC (04-PERMISSIONS)
+│   └── authorization.md # Autorização / RBAC + scopes (04-PERMISSIONS, 12-EXTRAS)
 └── decisions/
-    └── adr-XXX.md       # Decisões de arquitetura (ADRs)
+    └── adr-001.md .. adr-011.md  # Decisões de arquitetura (ADRs)
 ```
 
-A fonte da verdade do produto são os arquivos `sdd/*.md`; os documentos em `docs/` são a adoção estruturada desse conteúdo no padrão.
+A fonte da verdade do produto são os arquivos `sdd/*.md`, incluindo **`sdd/11-EXTRAS.md`** (IAM completo, 20 temas, i18n) e **`sdd/12-EXTRAS.md`** (API First, API Keys, webhooks, IA, WhatsApp). Os documentos em `docs/` são a adoção estruturada desse conteúdo no padrão. Cada decisão de arquitetura é registrada em `decisions/adr-XXX.md` (atualmente ADR-001 a ADR-011).

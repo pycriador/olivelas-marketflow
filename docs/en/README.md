@@ -3,7 +3,7 @@ title: "MarketFlow — Index"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -28,8 +28,8 @@ Documentation of MarketFlow, a SaaS platform for small businesses to organize pr
 
 | Document | Description | Mapped from |
 | --- | --- | --- |
-| [project-overview.md](project-overview.md) | Purpose, scope, users, system map | `sdd/00-VISION.md` |
-| [roadmap.md](roadmap.md) | Priorities, MVP and incremental evolution | `sdd/06-ROADMAP.md`, `sdd/10-FULL-SYSTEM.md` |
+| [project-overview.md](project-overview.md) | Purpose, scope, users, system map | `sdd/00-VISION.md`, `sdd/10-FULL-SYSTEM.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` |
+| [roadmap.md](roadmap.md) | Priorities, MVP and incremental evolution | `sdd/06-ROADMAP.md`, `sdd/10-FULL-SYSTEM.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` |
 | [architecture/overview.md](architecture/overview.md) | Context, components, boundaries, dependencies | `sdd/01-FOUNDATION.md` |
 | [architecture/data-model.md](architecture/data-model.md) | Core entities, multi-tenant isolation | `sdd/02-DATABASE.md` |
 | [contracts/api.md](contracts/api.md) | Access surface and API contracts | `sdd/05-API.md` |
@@ -49,6 +49,10 @@ Documentation of MarketFlow, a SaaS platform for small businesses to organize pr
 | [ADR-005](decisions/adr-005-auth-providers.md) | MVP authentication providers | `sdd/03-AUTH.md` |
 | [ADR-006](decisions/adr-006-monetization-free-first.md) | Free First monetization with backend limits | `sdd/07-MONETIZATION.md` |
 | [ADR-007](decisions/adr-007-design-system.md) | Design system: shadcn/ui, Content First | `sdd/09-DESIGN_SYSTEM.md` |
+| [ADR-008](decisions/adr-008-api-first-and-api-keys.md) | API First: versioned REST + API Keys with scopes | `sdd/12-EXTRAS.md` |
+| [ADR-009](decisions/adr-009-ai-service-abstraction.md) | AI Service provider abstraction | `sdd/12-EXTRAS.md` |
+| [ADR-010](decisions/adr-010-whatsapp-service.md) | WhatsApp Service + message templates | `sdd/12-EXTRAS.md` |
+| [ADR-011](decisions/adr-011-themes-and-internationalization.md) | 20 themes + i18n (pt-BR/EN/ES) | `sdd/11-EXTRAS.md` |
 
 ## Validation rules
 

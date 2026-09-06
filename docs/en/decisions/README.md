@@ -3,7 +3,7 @@ title: "MarketFlow — Architecture Decisions (ADR)"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -29,6 +29,10 @@ Index of MarketFlow architecture decisions. Each ADR follows the `adr.md` templa
 | [ADR-005](adr-005-auth-providers.md) | Authentication providers (email+password, Google OAuth; MFA future) | Accepted | `sdd/03-AUTH.md` |
 | [ADR-006](adr-006-monetization-free-first.md) | Free First monetization; backend limits; billing per company | Accepted | `sdd/07-MONETIZATION.md` |
 | [ADR-007](adr-007-design-system.md) | Design system: shadcn/ui, Content First | Accepted | `sdd/09-DESIGN_SYSTEM.md` |
+| [ADR-008](adr-008-api-first-and-api-keys.md) | API First: versioned REST (`/api/v1`) + API Keys (`mf_live_`/`mf_test_`) with scopes | Accepted | `sdd/12-EXTRAS.md` |
+| [ADR-009](adr-009-ai-service-abstraction.md) | AI Service with provider abstraction (OpenAI/Gemini/Anthropic/mock), confidence-based review | Accepted | `sdd/12-EXTRAS.md` |
+| [ADR-010](adr-010-whatsapp-service.md) | WhatsApp Service abstraction + per-company message templates | Accepted | `sdd/12-EXTRAS.md` |
+| [ADR-011](adr-011-themes-and-internationalization.md) | 20 themes (10 light/10 dark) + i18n (pt-BR/EN/ES) | Accepted | `sdd/11-EXTRAS.md` |
 
 ## How to record a new ADR
 

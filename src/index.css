@@ -1,0 +1,374 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* 1. Theme Corporate Blue (Default Light) */
+  :root, .theme-corporate {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  /* 2. Theme Emerald Green Light */
+  .theme-emerald {
+    --background: 140 20% 99%;
+    --foreground: 160 84% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 160 84% 10%;
+    --primary: 152 76% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 140 30% 94%;
+    --secondary-foreground: 160 84% 10%;
+    --muted: 140 20% 95%;
+    --muted-foreground: 150 20% 40%;
+    --accent: 140 30% 94%;
+    --accent-foreground: 160 84% 10%;
+    --border: 140 20% 88%;
+    --input: 140 20% 88%;
+    --ring: 152 76% 38%;
+  }
+
+  /* 3. Theme Indigo Purple Light */
+  .theme-indigo {
+    --background: 240 20% 99%;
+    --foreground: 244 50% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 244 50% 12%;
+    --primary: 239 84% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 30% 95%;
+    --secondary-foreground: 244 50% 12%;
+    --muted: 240 20% 95%;
+    --muted-foreground: 240 15% 45%;
+    --accent: 240 30% 95%;
+    --accent-foreground: 244 50% 12%;
+    --border: 240 20% 90%;
+    --input: 240 20% 90%;
+    --ring: 239 84% 60%;
+  }
+
+  /* 4. Theme Sunset Amber Light */
+  .theme-amber {
+    --background: 35 30% 98%;
+    --foreground: 25 50% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 25 50% 12%;
+    --primary: 32 95% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 40% 93%;
+    --secondary-foreground: 25 50% 12%;
+    --muted: 35 20% 94%;
+    --muted-foreground: 25 20% 45%;
+    --border: 35 30% 88%;
+    --input: 35 30% 88%;
+    --ring: 32 95% 48%;
+  }
+
+  /* 5. Theme Rose Crimson Light */
+  .theme-rose {
+    --background: 350 30% 99%;
+    --foreground: 345 50% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 345 50% 12%;
+    --primary: 346 84% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 350 40% 95%;
+    --secondary-foreground: 345 50% 12%;
+    --muted: 350 20% 95%;
+    --muted-foreground: 345 15% 45%;
+    --border: 350 25% 90%;
+    --input: 350 25% 90%;
+    --ring: 346 84% 54%;
+  }
+
+  /* 6. Theme Slate Cool Light */
+  .theme-slate-light {
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+    --primary: 215 25% 27%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 93%;
+    --muted: 210 15% 93%;
+    --muted-foreground: 215 15% 45%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 215 25% 27%;
+  }
+
+  /* 7. Theme Teal Ocean Light */
+  .theme-teal {
+    --background: 180 20% 99%;
+    --foreground: 185 50% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 185 50% 10%;
+    --primary: 175 84% 32%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 30% 94%;
+    --muted: 180 20% 94%;
+    --muted-foreground: 185 20% 40%;
+    --border: 180 20% 88%;
+    --input: 180 20% 88%;
+    --ring: 175 84% 32%;
+  }
+
+  /* 8. Theme Warm Paper Light */
+  .theme-paper {
+    --background: 40 30% 96%;
+    --foreground: 30 25% 15%;
+    --card: 40 30% 98%;
+    --card-foreground: 30 25% 15%;
+    --primary: 28 65% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 25% 90%;
+    --muted: 40 20% 90%;
+    --muted-foreground: 30 15% 45%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 28 65% 42%;
+  }
+
+  /* 9. Theme High Contrast Light */
+  .theme-high-contrast-light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --primary: 220 100% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 90%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 25%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 220 100% 35%;
+  }
+
+  /* 10. Theme Fresh Mint Light */
+  .theme-mint {
+    --background: 160 30% 98%;
+    --foreground: 165 60% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 165 60% 10%;
+    --primary: 162 94% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 160 30% 93%;
+    --muted: 160 20% 93%;
+    --muted-foreground: 165 20% 40%;
+    --border: 160 25% 88%;
+    --input: 160 25% 88%;
+    --ring: 162 94% 30%;
+  }
+
+  /* ========================================================= */
+  /* TEMAS ESCUROS (10 ESCUROS) */
+  /* ========================================================= */
+
+  /* 11. MarketFlow Dark (Default Dark) */
+  .dark, .theme-dark-corporate {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 144 100% 97.3%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 10%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+
+  /* 12. Theme Midnight Blue Dark */
+  .theme-midnight {
+    --background: 230 40% 8%;
+    --foreground: 220 40% 96%;
+    --card: 230 40% 11%;
+    --card-foreground: 220 40% 96%;
+    --primary: 224 85% 62%;
+    --primary-foreground: 230 40% 8%;
+    --secondary: 230 30% 18%;
+    --muted: 230 30% 18%;
+    --muted-foreground: 220 20% 65%;
+    --border: 230 30% 18%;
+    --input: 230 30% 18%;
+    --ring: 224 85% 62%;
+  }
+
+  /* 13. Theme Dracula Purple Dark */
+  .theme-dracula {
+    --background: 244 16% 12%;
+    --foreground: 250 20% 95%;
+    --card: 244 16% 15%;
+    --card-foreground: 250 20% 95%;
+    --primary: 265 89% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 244 16% 22%;
+    --muted: 244 16% 22%;
+    --muted-foreground: 250 15% 65%;
+    --border: 244 16% 22%;
+    --input: 244 16% 22%;
+    --ring: 265 89% 66%;
+  }
+
+  /* 14. Theme Cyberpunk Neon Dark */
+  .theme-cyberpunk {
+    --background: 280 50% 6%;
+    --foreground: 300 100% 95%;
+    --card: 280 50% 9%;
+    --card-foreground: 300 100% 95%;
+    --primary: 316 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 100% 50%;
+    --secondary-foreground: 280 50% 6%;
+    --muted: 280 30% 18%;
+    --muted-foreground: 300 30% 70%;
+    --border: 316 80% 40%;
+    --input: 316 80% 40%;
+    --ring: 316 100% 50%;
+  }
+
+  /* 15. Theme Nord Frost Dark */
+  .theme-nord {
+    --background: 220 16% 16%;
+    --foreground: 218 27% 92%;
+    --card: 220 16% 20%;
+    --card-foreground: 218 27% 92%;
+    --primary: 193 43% 67%;
+    --primary-foreground: 220 16% 16%;
+    --secondary: 220 16% 26%;
+    --muted: 220 16% 26%;
+    --muted-foreground: 218 15% 65%;
+    --border: 220 16% 26%;
+    --input: 220 16% 26%;
+    --ring: 193 43% 67%;
+  }
+
+  /* 16. Theme Forest Dark */
+  .theme-forest {
+    --background: 150 30% 8%;
+    --foreground: 140 30% 94%;
+    --card: 150 30% 11%;
+    --card-foreground: 140 30% 94%;
+    --primary: 142 60% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 25% 18%;
+    --muted: 150 25% 18%;
+    --muted-foreground: 140 15% 65%;
+    --border: 150 25% 18%;
+    --input: 150 25% 18%;
+    --ring: 142 60% 45%;
+  }
+
+  /* 17. Theme High Contrast Dark */
+  .theme-high-contrast-dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --primary: 50 100% 50%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 20%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 80%;
+    --border: 0 0% 100%;
+    --input: 0 0% 100%;
+    --ring: 50 100% 50%;
+  }
+
+  /* 18. Theme Slate Dark */
+  .theme-slate-dark {
+    --background: 215 28% 13%;
+    --foreground: 210 40% 98%;
+    --card: 215 28% 16%;
+    --card-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 215 28% 13%;
+    --secondary: 215 20% 22%;
+    --muted: 215 20% 22%;
+    --muted-foreground: 215 15% 65%;
+    --border: 215 20% 22%;
+    --input: 215 20% 22%;
+    --ring: 210 40% 98%;
+  }
+
+  /* 19. Theme Obsidian Black Dark */
+  .theme-obsidian {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 95%;
+    --primary: 260 100% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 60%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 260 100% 65%;
+  }
+
+  /* 20. Theme Sunset Dark */
+  .theme-sunset-dark {
+    --background: 20 40% 7%;
+    --foreground: 20 40% 95%;
+    --card: 20 40% 10%;
+    --card-foreground: 20 40% 95%;
+    --primary: 18 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 20 30% 17%;
+    --muted: 20 30% 17%;
+    --muted-foreground: 20 20% 65%;
+    --border: 20 30% 17%;
+    --input: 20 30% 17%;
+    --ring: 18 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MarketFlow — Redirecionando...</title>
+    <script type="text/javascript">
+      // Script SPA para GitHub Pages (Single Page Apps for GitHub Pages)
+      // https://github.com/rafgraph/spa-github-pages
+      // Este script redireciona rotas diretas (ex: /admin/products) para o index.html
+      // preservando query params e hash na query string do index.html.
+
+      var pathSegmentsToKeep = 1; // 1 porque o repositório está em /olivelas-marketflow/
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

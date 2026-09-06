@@ -3,7 +3,7 @@ title: "MarketFlow — Autenticação"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -16,19 +16,25 @@ version: "1.0"
 >
 > Documentation Standard v1.0
 
-Fonte: [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md). Estado proposto (não implementado).
+Fonte: [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md). Parcialmente implementado (protótipo de frontend conecta o client Supabase Auth; fluxos completos de backend pendentes).
 
 ## Propósito
 
-Definir como os usuários provam identidade no MarketFlow: providers, princípios e responsabilidades sobre credenciais e sessões.
+Definir como usuários (humanos) e integradores (máquinas) provam identidade no MarketFlow: providers, princípios e responsabilidades sobre credenciais e sessões. A autenticação de máquina (API Keys) é mencionada aqui apenas como referência — detalhes em [contracts/api.md](../contracts/api.md) e [ADR-008](../decisions/adr-008-api-first-and-api-keys.md).
 
-## Ponto de entrada (mecanismo)
+## Ponto de entrada (mecanismo) — humano
 
 | Ponto de entrada | Mecanismo | Classificação |
 | --- | --- | --- |
 | Cadastro / login | Supabase Auth — email + senha | Confirmed (SDD) |
 | Cadastro / login | Supabase Auth — Google OAuth | Confirmed (SDD) |
 | Sessão | Tokens de sessão gerenciados pelo Supabase Auth | Confirmed (SDD) |
+
+## Ponto de entrada (mecanismo) — máquina
+
+| Ponto de entrada | Mecanismo | Classificação |
+| --- | --- | --- |
+| Acesso de API | API Keys `mf_live_...` / `mf_test_...` (bearer) | Confirmed (SDD) — ADR-008 |
 
 ## Providers — MVP
 
@@ -42,7 +48,7 @@ Definir como os usuários provam identidade no MarketFlow: providers, princípio
 | OIDC | Futuro | — |
 | SAML | Futuro (enterprise) | — |
 
-Os secrets de OAuth vivem em configuração segura do provedor (nunca no frontend).
+Os secrets de OAuth vivem em configuração segura do provedor (nunca no frontend). API Keys ficam hashadas em repouso (`secret_hash`) e são exibidas completas uma única vez, na criação.
 
 ## MFA
 
@@ -72,14 +78,14 @@ Os secrets de OAuth vivem em configuração segura do provedor (nunca no fronten
 | --- | --- | --- |
 | Supabase Auth | Identidade, sessões, providers, hashing | Confirmed (SDD) |
 | Frontend | Redirecionamentos, estados de sessão, captura de erros | Confirmed (SDD) |
-| Edge Functions | Token validation em operações privilegiadas | Confirmed (SDD) |
+| Edge Functions / camada de API | Validação de token em operações privilegiadas; cheque de hash/status de API Key | Confirmed (SDD) |
 | PostgreSQL/RLS | Nunca confia em `user_id`/`company_id` do cliente | Confirmed (SDD) |
 
 ## Documentação relacionada
 
 | Documento | Path |
 | --- | --- |
-| Autorização (RBAC) | [authorization.md](authorization.md) |
+| Autorização (RBAC + scopes) | [authorization.md](authorization.md) |
 | Segurança (postura geral) | [security.md](security.md) |
-| Contratos | [contracts/api.md](../contracts/api.md) |
+| Contratos (API Keys) | [contracts/api.md](../contracts/api.md) |
 | Fonte completa | [`sdd/03-AUTH.md`](../../../sdd/03-AUTH.md) |

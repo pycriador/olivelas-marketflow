@@ -3,7 +3,7 @@ title: "MarketFlow — Roadmap"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -16,7 +16,7 @@ version: "1.0"
 >
 > Documentation Standard v1.0
 
-Fonte: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md) e itens de backlog em [`sdd/10-FULL-SYSTEM.md`](../../sdd/10-FULL-SYSTEM.md).
+Fonte: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), itens de backlog em [`sdd/10-FULL-SYSTEM.md`](../../sdd/10-FULL-SYSTEM.md), [`sdd/11-EXTRAS.md`](../../sdd/11-EXTRAS.md) e [`sdd/12-EXTRAS.md`](../../sdd/12-EXTRAS.md).
 
 ## Princípios de evolução
 
@@ -36,24 +36,25 @@ Fonte: [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md) e itens de backlog em [`sd
 
 ## MVP (P0)
 
-Fonte: `sdd/06-ROADMAP.md` e backlog `29-BACKLOG`.
+Fonte: `sdd/06-ROADMAP.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` e backlog `29-BACKLOG`.
 
 - Landing page.
 - Auth (email+senha + Google OAuth) e criação da primeira empresa.
 - Multiempresa e troca de empresa.
-- IAM/RBAC (GLOBAL_ADMIN, ADMIN, STOCK, VISITOR).
-- Categorias, marcas, fabricantes, fornecedores.
+- IAM/RBAC (GLOBAL_ADMIN, ADMIN, STOCK, VISITOR) + gestão completa de usuários (convites, papéis, listagem).
+- Categorias, marcas, fabricantes, fornecedores (CRUD completo).
 - Produtos (CRUD, imagens, preço de custo/venda/promocional, SKU/barcode, unidades).
-- Estoque básico (entrada, saída, ajuste, perda, inventário, histórico).
-- Lotes e validade.
-- Catálogo público (publicação de produtos, slug da empresa).
-- Solicitações básicas do catálogo.
-- IA de cadastro de produto (foto → dados + confiança → revisão humana → salvar).
+- Estoque básico (entrada, saída, ajuste, perda, inventário, histórico) e lotes/validade.
+- Catálogo público (publicação de produtos, slug da empresa) e solicitações do catálogo.
+- 20 temas (10 light / 10 dark) e seleção de idioma (pt-BR/EN/ES) persistidos por usuário.
+- IA de cadastro de produto (foto → dados + confiança → revisão humana → salvar) com abstração do AI Service.
+- WhatsApp: templates de mensagens por empresa, variáveis, preview, histórico e retry.
+- Área de desenvolvedores: API Keys (`mf_live_`/`mf_test_`) com scopes; docs OpenAPI.
 - Notificações in-app (estoque baixo, vencimento, convites, solicitações).
 
 ## Segurança P0/P1
 
-- P0: Supabase Auth, RLS, isolamento de tenant, RBAC, autorização no backend, Storage seguro, validação de entrada, filtragem de saída, secrets, HTTPS, rate limiting básico, audit logs para operações críticas, proteção de estoque e do catálogo público, quota de IA, testes cross-tenant e IDOR/BOLA.
+- P0: Supabase Auth, RLS, isolamento de tenant, RBAC, autorização no backend, Storage seguro, validação de entrada, filtragem de saída, secrets, HTTPS, rate limiting básico, audit logs para operações críticas, proteção de estoque e do catálogo público, quota de IA, hashing/scopes de API Keys, testes cross-tenant e IDOR/BOLA.
 - P1: security headers, CSP, monitoring, dependency scanning, backup/recovery, abuse detection, security alerts, controles avançados de custo de IA.
 - P2 (futuro): MFA, custom roles, ABAC, SSO/SAML/OIDC, IP allowlist, detecção avançada de ameaças, fluxos avançados de LGPD.
 
@@ -65,6 +66,8 @@ Critérios de aceitação de segurança do MVP em `sdd/08-SECURITY.md`.
 - Melhorias de observabilidade (logs estruturados, métricas, alertas).
 - Segurança P1 (acima).
 - Eficiência e otimização da IA (controles de custo).
+- Hardening de webhooks e docs de desenvolvedores.
+- Cobertura completa de migrations (políticas RLS, triggers/functions, `plan_limits`, tabelas de catálogo).
 
 ## P2 — Evolução
 
@@ -77,9 +80,9 @@ Critérios de aceitação de segurança do MVP em `sdd/08-SECURITY.md`.
 - Fiscal.
 - Financeiro.
 - Filiais.
-- API pública para terceiros.
+- GraphQL ou outras versões de API sobre a base API-first.
 - Automações e AI Copilot.
-- Notificações multicanal (e-mail, WhatsApp, push).
+- Notificações por e-mail/push (WhatsApp já está no escopo).
 - Billing/pagamentos online (gateway + webhooks).
 - Recursos Enterprise (SSO, SAML, OIDC, IP allowlist, relatórios avançados).
 
@@ -94,4 +97,5 @@ Analise todos os documentos do projeto antes de criar tarefas. Identifique depen
 | Visão geral do projeto | [project-overview.md](project-overview.md) |
 | Segurança (prioridades) | [security/security.md](security/security.md) |
 | Monetização | [decisions/adr-006-monetization-free-first.md](decisions/adr-006-monetization-free-first.md) |
-| Fonte | [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), [`sdd/07-MONETIZATION.md`](../../sdd/07-MONETIZATION.md) |
+| API First | [decisions/adr-008-api-first-and-api-keys.md](decisions/adr-008-api-first-and-api-keys.md) |
+| Fonte | [`sdd/06-ROADMAP.md`](../../sdd/06-ROADMAP.md), [`sdd/07-MONETIZATION.md`](../../sdd/07-MONETIZATION.md), [`sdd/11-EXTRAS.md`](../../sdd/11-EXTRAS.md), [`sdd/12-EXTRAS.md`](../../sdd/12-EXTRAS.md) |

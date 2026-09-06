@@ -3,7 +3,7 @@ title: "MarketFlow — Índice"
 status: "DRAFT"
 owner: "marketflow-team"
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 review_date: "2026-12-04"
 version: "1.0"
 ---
@@ -28,8 +28,8 @@ Documentação do MarketFlow, plataforma SaaS para pequenos comércios organizar
 
 | Documento | Descrição | Mapeado de |
 | --- | --- | --- |
-| [project-overview.md](project-overview.md) | Propósito, escopo, usuários, mapa do sistema | `sdd/00-VISION.md` |
-| [roadmap.md](roadmap.md) | Prioridades, MVP e evolução incremental | `sdd/06-ROADMAP.md`, `sdd/10-FULL-SYSTEM.md` |
+| [project-overview.md](project-overview.md) | Propósito, escopo, usuários, mapa do sistema | `sdd/00-VISION.md`, `sdd/10-FULL-SYSTEM.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` |
+| [roadmap.md](roadmap.md) | Prioridades, MVP e evolução incremental | `sdd/06-ROADMAP.md`, `sdd/10-FULL-SYSTEM.md`, `sdd/11-EXTRAS.md`, `sdd/12-EXTRAS.md` |
 | [architecture/overview.md](architecture/overview.md) | Contexto, componentes, limites, dependências | `sdd/01-FOUNDATION.md` |
 | [architecture/data-model.md](architecture/data-model.md) | Entidades centrais, isolamento multi-tenant | `sdd/02-DATABASE.md` |
 | [contracts/api.md](contracts/api.md) | Superfície de acesso e contratos de API | `sdd/05-API.md` |
@@ -49,6 +49,10 @@ Documentação do MarketFlow, plataforma SaaS para pequenos comércios organizar
 | [ADR-005](decisions/adr-005-auth-providers.md) | Providers de autenticação do MVP | `sdd/03-AUTH.md` |
 | [ADR-006](decisions/adr-006-monetization-free-first.md) | Monetização Free First com limites no backend | `sdd/07-MONETIZATION.md` |
 | [ADR-007](decisions/adr-007-design-system.md) | Design system: shadcn/ui, Content First | `sdd/09-DESIGN_SYSTEM.md` |
+| [ADR-008](decisions/adr-008-api-first-and-api-keys.md) | API First: REST versionada + API Keys com scopes | `sdd/12-EXTRAS.md` |
+| [ADR-009](decisions/adr-009-ai-service-abstraction.md) | AI Service com abstração de providers | `sdd/12-EXTRAS.md` |
+| [ADR-010](decisions/adr-010-whatsapp-service.md) | WhatsApp Service + templates de mensagens | `sdd/12-EXTRAS.md` |
+| [ADR-011](decisions/adr-011-themes-and-internationalization.md) | 20 temas + i18n (pt-BR/EN/ES) | `sdd/11-EXTRAS.md` |
 
 ## Regras de validação
 
