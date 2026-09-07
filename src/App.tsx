@@ -180,11 +180,13 @@ export const App: React.FC = () => {
   }
 
   // Tratamento da Landing Page Pública
-  if (currentPath === '/landing') {
+  if (currentPath === '/landing' || (!isAuthenticated && (currentPath === '/' || currentPath === ''))) {
     return (
       <LandingPage
-        onNavigateLogin={() => navigate('/admin/dashboard')}
-        onNavigateCatalogDemo={() => navigate('/loja/mercado-central')}
+        onNavigateLogin={() => navigate('/login')}
+        onNavigateSignup={() => navigate('/cadastro')}
+        onNavigateCatalogDemo={() => navigate('/loja/cestas-cafe-da-manha')}
+        onNavigateBasketDemo={() => navigate('/loja/cestas-cafe-da-manha/cesta')}
       />
     );
   }
@@ -210,6 +212,7 @@ export const App: React.FC = () => {
       <LoginPage
         initialMode={currentPath === '/cadastro' || currentPath === '/register' ? 'signup' : 'login'}
         onSuccess={() => navigate('/admin/dashboard')}
+        onNavigateLanding={() => navigate('/landing')}
       />
     );
   }

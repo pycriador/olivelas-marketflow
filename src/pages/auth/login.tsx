@@ -8,7 +8,8 @@ import { useAuth } from '../../context/auth-context';
 export const LoginPage: React.FC<{
   onSuccess: () => void;
   initialMode?: 'login' | 'signup';
-}> = ({ onSuccess, initialMode = 'login' }) => {
+  onNavigateLanding?: () => void;
+}> = ({ onSuccess, initialMode = 'login', onNavigateLanding }) => {
   const { loginWithEmail, signupWithEmail, loginWithGoogle, isLoading } = useAuth();
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
 
@@ -377,7 +378,7 @@ export const LoginPage: React.FC<{
           </div>
         </CardContent>
 
-        <CardFooter className="justify-center border-t py-3">
+        <CardFooter className="flex-col space-y-2 justify-center border-t py-3.5">
           <p className="text-[11px] text-muted-foreground text-center">
             {mode === 'login' ? (
               <>
@@ -409,6 +410,16 @@ export const LoginPage: React.FC<{
               </>
             )}
           </p>
+
+          {onNavigateLanding && (
+            <button
+              type="button"
+              onClick={onNavigateLanding}
+              className="text-[11px] text-muted-foreground hover:text-primary transition-colors font-medium"
+            >
+              ← Conhecer a plataforma e ver telas do sistema
+            </button>
+          )}
         </CardFooter>
       </Card>
     </div>
