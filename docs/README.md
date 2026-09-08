@@ -73,8 +73,18 @@ graph TD
 
 ---
 
+## 📌 Documentos Mestres e Auditoria de Prompts
+
+Além da Wiki modular por assunto, o projeto disponibiliza três documentos estratégicos fundamentais:
+- 📜 **[Histórico de Prompts e Evolução do Projeto (docs/PROMPTS_AND_EVOLUTION_LOG.md)](PROMPTS_AND_EVOLUTION_LOG.md):** Linha do tempo com os 39 prompts executados, decisões arquiteturais e arquivos gerados.
+- 🏗️ **[Blueprint Canônico de Reconstrução do Sistema (docs/SYSTEM_RECONSTRUCTION_BLUEPRINT.md)](SYSTEM_RECONSTRUCTION_BLUEPRINT.md):** Manual exaustivo de engenharia reversa para recriação do sistema do zero sem o código original.
+- 🤖 **[Manual de Contexto para Agentes de IA (AI_CONTEXT.md)](../AI_CONTEXT.md):** Diretrizes invioláveis, modelos mentais, regras de negócio e backlog técnico para continuidade por IAs.
+
+---
+
 ## 📌 Diretrizes de Leitura e Convenções
 
 1. **Evite Duplicação de Conceitos:** Cada documento trata exclusivamente do seu escopo funcional e referencia os demais através de links relativos navegáveis.
 2. **IDs Semânticos:** O sistema utiliza slugs alfanuméricos (`comp-cesta-1`, `beb-suco-delvalle-200`) em vez de UUIDs arbitrários para facilitar leitura física e interoperabilidade.
 3. **Resiliência Offline:** Qualquer operação na plataforma é executada primeiro localmente (`localStorage`) e propagada em segundo plano para a nuvem.
+
