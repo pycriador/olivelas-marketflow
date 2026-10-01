@@ -1,9 +1,10 @@
 import React from 'react';
-import { Menu, ExternalLink, Sparkles, Bell, Palette } from 'lucide-react';
+import { Menu, ExternalLink, Sparkles, Bell, Palette, CloudOff } from 'lucide-react';
 import { CompanySwitcher } from '../ui/company-switcher';
 import { Button } from '../ui/button';
 import { LanguageSwitcher } from '../ui/language-switcher';
 import { useCompany } from '../../context/company-context';
+import { useAuth } from '../../context/auth-context';
 
 interface HeaderNavProps {
   onToggleMobileMenu: () => void;
@@ -19,6 +20,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onNavigate,
 }) => {
   const { currentCompany } = useCompany();
+  const { isOfflineSession } = useAuth();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 backdrop-blur transition-all lg:px-6">
@@ -35,6 +37,15 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
         <div className="w-56 sm:w-64 lg:w-72">
           <CompanySwitcher onOpenCreateModal={onOpenCreateCompanyModal} />
         </div>
+
+        {isOfflineSession && (
+          <span
+            className="hidden sm:inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400 border border-amber-500/20"
+            title="Operando com banco local em cache. O Supabase remoto está inacessível ou pausado por inatividade."
+          >
+            <CloudOff className="h-3.5 w-3.5" /> Modo Local (Offline)
+          </span>
+        )}
       </div>
 
       {/* Lado Direito: Seletor de Idioma, Galeria de Temas, Ações Rápidas */}

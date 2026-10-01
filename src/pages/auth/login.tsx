@@ -42,6 +42,8 @@ export const LoginPage: React.FC<{
         setError('E-mail ou senha incorretos. Verifique suas credenciais.');
       } else if (msg.includes('Email not confirmed')) {
         setError('Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.');
+      } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('fetch') || msg.includes('Failed to load')) {
+        setError('Não foi possível conectar ao Supabase (projeto pausado por inatividade ou domínio indisponível). Utilize as credenciais de teste abaixo para entrar no Modo Local / Contingência.');
       } else {
         setError(msg || 'Erro ao efetuar login no banco de dados. Tente novamente.');
       }
