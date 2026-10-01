@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = process.env.SUPABASE_URL || 'https://rstjtnrdpfaxlfxqycig.supabase.co';
+const url = process.env.SUPABASE_URL || 'https://mfyyezvpfpflpekosjif.supabase.co';
 const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
 const secretKey = process.env.SUPABASE_SECRET_KEY || '';
 
@@ -65,7 +65,7 @@ async function runTests() {
 
   console.log('\n====================================================');
   console.log('Instruções para ativação imediata no Supabase:');
-  console.log('1. Abra o painel do Supabase: https://supabase.com/dashboard/project/rstjtnrdpfaxlfxqycig/sql/new');
+  console.log('1. Abra o painel do Supabase: https://supabase.com/dashboard/project/mfyyezvpfpflpekosjif/sql/new');
   console.log('2. Copie todo o conteúdo do arquivo: supabase/consolidated_schema.sql');
   console.log('3. Cole no editor SQL do Supabase e clique no botão "RUN".');
   console.log('4. Pronto! Todas as 12 tabelas, enums, triggers de usuários e 51 produtos reais serão criados no PostgreSQL.');
