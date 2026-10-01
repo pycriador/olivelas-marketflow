@@ -359,8 +359,10 @@ INSERT INTO public.categories (id, company_id, name, description, active) VALUES
 ('cat-frutas', 'comp-cesta-1', 'Frutas Selecionadas', 'Frutas frescas e higienizadas da estação.', true),
 ('cat-doces-geleias', 'comp-cesta-1', 'Doces & Geleias', 'Nutella, geleias artesanais e mel.', true),
 ('cat-chocolates', 'comp-cesta-1', 'Chocolates & Bombons', 'Milka, Ferrero Rocher, Lindt e bombons.', true),
+('cat-mercearia-cafe', 'comp-cesta-1', 'Café & Mercearia', 'Cafés solúveis, sachês, cappuccinos, manteigas e açúcares.', true),
+('cat-adicionais', 'comp-cesta-1', 'Adicionais & Presentes', 'Itens comemorativos, canecas, cartões, balões e flores.', true),
 ('cat-canecas-brindes', 'comp-cesta-1', 'Canecas & Brindes', 'Itens comemorativos, canecas e cartões de presente.', true)
-ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 
 -- 3. Fornecedores
 INSERT INTO public.suppliers (id, company_id, name, legal_name, cnpj, phone, whatsapp, active) VALUES
