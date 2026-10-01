@@ -40,8 +40,9 @@ jobs:
         run: npm run build:gh-pages
         env:
           GITHUB_PAGES: 'true'
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://rstjtnrdpfaxlfxqycig.supabase.co' }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'sb_publishable_c9HAuwCSaxda7jEeRfTXlA_n_82ty4R' }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL || 'https://mfyyezvpfpflpekosjif.supabase.co' }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY || 'sb_publishable_1TrxmlacdOxuxq55tYwj2w_UkAHA7BN' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || vars.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_1TrxmlacdOxuxq55tYwj2w_UkAHA7BN' }}
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5

@@ -23,7 +23,7 @@ function generate() {
 
   let sql = `-- ====================================================================
 -- MarketFlow — Consolidated Database Schema & Complete Seed Data
--- Target Database: Supabase PostgreSQL (project: rstjtnrdpfaxlfxqycig)
+-- Target Database: Supabase PostgreSQL (project: mfyyezvpfpflpekosjif)
 -- ====================================================================
 
 -- 1. Custom Types & Extensions
