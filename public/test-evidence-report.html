@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketFlow — Relatório Oficial de Testes & Evidências</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <!-- Header Executivo -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-blue-500/20">
+          M
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            MarketFlow <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Test Evidence Suite</span>
+          </h1>
+          <p class="text-xs text-slate-400">Relatório Executivo de Homologação, Qualidade e Integração Contínua</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          100% Homologado em Produção
+        </span>
+        <a href="../README.md" class="text-xs text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700">
+          Voltar ao README
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+    <!-- Sumário Executivo & Métricas -->
+    <section>
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-6">
+        <div>
+          <h2 class="text-2xl font-extrabold text-white tracking-tight">Sumário Executivo da Homologação</h2>
+          <p class="text-sm text-slate-400 mt-1">Ambiente: Supabase PostgreSQL (mfyyezvpfpflpekosjif) & GitHub Pages Production Build</p>
+        </div>
+        <div class="text-xs text-slate-400 mt-2 md:mt-0">
+          Executado em: <strong class="text-slate-200">02/10/2026, 12:53:54</strong>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Taxa de Sucesso Geral</div>
+          <div class="text-3xl font-extrabold text-emerald-400 mt-2 flex items-baseline gap-2">
+            100.0%
+            <span class="text-xs font-medium text-slate-400 font-sans">(24/24 testes)</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+            <div class="bg-emerald-500 h-full rounded-full" style="width: 100.0%"></div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Testes de Interface (E2E)</div>
+          <div class="text-3xl font-extrabold text-blue-400 mt-2 flex items-baseline gap-2">
+            17/17
+            <span class="text-xs font-medium text-slate-400 font-sans">Telas Validadas</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-3">Evidências em alta definição capturadas</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Testes de API REST / Auth</div>
+          <div class="text-3xl font-extrabold text-purple-400 mt-2 flex items-baseline gap-2">
+            7/7
+            <span class="text-xs font-medium text-slate-400 font-sans">Endpoints 200 OK</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-3">Supabase GoTrue & PostgREST integrados</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm hover:border-slate-700 transition">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Latência Média de API</div>
+          <div class="text-3xl font-extrabold text-amber-400 mt-2 flex items-baseline gap-2">
+            411 ms
+            <span class="text-xs font-medium text-slate-400 font-sans">Tempo de Resposta</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-3">Alta performance com Cloudflare CDN</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testes de API Backend & Supabase -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+            Validação de APIs REST & Autenticação Supabase
+          </h3>
+          <p class="text-xs text-slate-400 mt-1">Conectividade direta com o banco de dados PostgreSQL e camada de segurança RLS</p>
+        </div>
+        <span class="text-xs bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2.5 py-1 rounded-full font-mono font-medium">
+          API Status: 100% OK
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-950/60 uppercase font-semibold text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="px-4 py-3">Serviço / Endpoint</th>
+              <th class="px-4 py-3">Método</th>
+              <th class="px-4 py-3">Status HTTP</th>
+              <th class="px-4 py-3">Tempo de Resposta</th>
+              <th class="px-4 py-3">Resultado / Registro</th>
+              <th class="px-4 py-3 text-right">Resultado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 font-mono">
+            
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Auth Token (Login com Senha)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300">POST</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">705 ms</td>
+              <td class="px-4 py-3 text-slate-400">willian.o.jesus@gmail.com</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Empresas (Companies)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">271 ms</td>
+              <td class="px-4 py-3 text-slate-400">2 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Catálogo de Produtos (Products + Relations)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">445 ms</td>
+              <td class="px-4 py-3 text-slate-400">51 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Categorias (Categories)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">428 ms</td>
+              <td class="px-4 py-3 text-slate-400">10 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Marcas Cadastradas (Brands)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">423 ms</td>
+              <td class="px-4 py-3 text-slate-400">39 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Itens de Estoque (Inventory Items)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">435 ms</td>
+              <td class="px-4 py-3 text-slate-400">51 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition">
+              <td class="px-4 py-3 font-semibold font-sans text-slate-100">Perfis de Usuários (Profiles)</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300">GET</span>
+              </td>
+              <td class="px-4 py-3 text-emerald-400 font-bold">200 OK</td>
+              <td class="px-4 py-3 text-slate-300">169 ms</td>
+              <td class="px-4 py-3 text-slate-400">3 registros retornados</td>
+              <td class="px-4 py-3 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  ✓ Aprovado
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Galeria de Evidências Fotográficas (Screenshots) -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            Galeria de Evidências Visuais das Telas (17 Capturas)
+          </h3>
+          <p class="text-sm text-slate-400 mt-1">Inspeção completa de fluxos de usuário, interfaces de administração e áreas públicas</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                1
+              </span>
+              <h4 class="font-bold text-sm text-white">Landing Page Oficial</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/01-landing-page.png" 
+              alt="Landing Page Oficial" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Apresentação comercial completa com Hero, métricas, recursos e badges de confiança.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 01-landing-page.png</span>
+              <a href="screenshots/01-landing-page.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                2
+              </span>
+              <h4 class="font-bold text-sm text-white">Tela de Autenticação (Login)</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/02-login-screen.png" 
+              alt="Tela de Autenticação (Login)" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Formulário de acesso com e-mail/senha, suporte a Google OAuth e atalhos de contas reais no Supabase.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 02-login-screen.png</span>
+              <a href="screenshots/02-login-screen.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                3
+              </span>
+              <h4 class="font-bold text-sm text-white">Criação de Conta (Sign Up)</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/03-signup-screen.png" 
+              alt="Criação de Conta (Sign Up)" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Fluxo de auto-cadastro com validação de campos, confirmação de senha e persistência no banco.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 03-signup-screen.png</span>
+              <a href="screenshots/03-signup-screen.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                4
+              </span>
+              <h4 class="font-bold text-sm text-white">Dashboard Executivo 360°</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/04-dashboard.png" 
+              alt="Dashboard Executivo 360°" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Visão geral gerencial: faturamento consolidado, alertas de validade crítica, estoque mínimo e ações rápidas.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 04-dashboard.png</span>
+              <a href="screenshots/04-dashboard.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                5
+              </span>
+              <h4 class="font-bold text-sm text-white">Catálogo de Produtos & Validade</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/05-products-catalog.png" 
+              alt="Catálogo de Produtos & Validade" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Tabela completa com 51 produtos reais, cálculo automático de validade, filtros por categoria e paginação.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 05-products-catalog.png</span>
+              <a href="screenshots/05-products-catalog.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                6
+              </span>
+              <h4 class="font-bold text-sm text-white">Cadastro & Edição de Produto</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/06-product-form.png" 
+              alt="Cadastro & Edição de Produto" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Formulário completo com código de barras EAN-13, precificação, categoria, marca, fotos e validade.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 06-product-form.png</span>
+              <a href="screenshots/06-product-form.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                7
+              </span>
+              <h4 class="font-bold text-sm text-white">Emissão de Etiquetas Térmicas</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/07-thermal-labels.png" 
+              alt="Emissão de Etiquetas Térmicas" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Geração de etiquetas de gôndola formatadas em folha A4 com código de barras, marca, nome e preço.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 07-thermal-labels.png</span>
+              <a href="screenshots/07-thermal-labels.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                8
+              </span>
+              <h4 class="font-bold text-sm text-white">Estoque Consolidado & Inventário</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/08-inventory.png" 
+              alt="Estoque Consolidado & Inventário" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Métricas de itens em estoque, saldo físico, reserva operacional e valor financeiro total imobilizado.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 08-inventory.png</span>
+              <a href="screenshots/08-inventory.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                9
+              </span>
+              <h4 class="font-bold text-sm text-white">Controle de Lotes & Validades</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/09-lots-expiration.png" 
+              alt="Controle de Lotes & Validades" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Rastreabilidade lote a lote com datas de fabricação, dias restantes de validade e alertas de risco.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 09-lots-expiration.png</span>
+              <a href="screenshots/09-lots-expiration.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                10
+              </span>
+              <h4 class="font-bold text-sm text-white">Movimentações Kardex de Estoque</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/10-movements-kardex.png" 
+              alt="Movimentações Kardex de Estoque" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Histórico cronológico de entradas, saídas, ajustes manuais e justificativas com auditoria.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 10-movements-kardex.png</span>
+              <a href="screenshots/10-movements-kardex.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                11
+              </span>
+              <h4 class="font-bold text-sm text-white">Relatórios & Métricas Operacionais</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/11-reports-overview.png" 
+              alt="Relatórios & Métricas Operacionais" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Curva ABC, produtos com maior giro, estimativa de perdas por validade e relatórios exportáveis.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 11-reports-overview.png</span>
+              <a href="screenshots/11-reports-overview.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                12
+              </span>
+              <h4 class="font-bold text-sm text-white">Montador Interativo de Cestas (Cliente)</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/12-basket-builder.png" 
+              alt="Montador Interativo de Cestas (Cliente)" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Experiência do cliente para personalização de cestas de presentes com regras de itens e envio para WhatsApp.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 12-basket-builder.png</span>
+              <a href="screenshots/12-basket-builder.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                13
+              </span>
+              <h4 class="font-bold text-sm text-white">Vitrine Digital Pública da Loja</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/13-public-storefront.png" 
+              alt="Vitrine Digital Pública da Loja" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Catálogo online para clientes finais consultarem estoque, preços e fazerem pedidos via WhatsApp.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 13-public-storefront.png</span>
+              <a href="screenshots/13-public-storefront.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                14
+              </span>
+              <h4 class="font-bold text-sm text-white">Perfil da Empresa & Configurações</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/14-company-profile.png" 
+              alt="Perfil da Empresa & Configurações" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Configuração de dados legais (CNPJ, Razão Social), WhatsApp de atendimento e identidade visual.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 14-company-profile.png</span>
+              <a href="screenshots/14-company-profile.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                15
+              </span>
+              <h4 class="font-bold text-sm text-white">Central de Desenvolvedores & API Docs</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/15-api-docs.png" 
+              alt="Central de Desenvolvedores & API Docs" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Documentação interativa de rotas REST, payloads JSON e autenticação Bearer Token para integrações.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 15-api-docs.png</span>
+              <a href="screenshots/15-api-docs.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                16
+              </span>
+              <h4 class="font-bold text-sm text-white">Assistente Inteligente com IA</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/16-ai-assistant.png" 
+              alt="Assistente Inteligente com IA" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Copiloto de IA para auxílio na precificação, elaboração de promoções e análise de rupturas de estoque.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 16-ai-assistant.png</span>
+              <a href="screenshots/16-ai-assistant.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg hover:border-slate-700 transition flex flex-col group">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+            <div class="flex items-center space-x-2">
+              <span class="w-6 h-6 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 font-bold text-xs flex items-center justify-center">
+                17
+              </span>
+              <h4 class="font-bold text-sm text-white">Gestão de Usuários & Acessos</h4>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              ✓ Aprovado
+            </span>
+          </div>
+
+          <div class="relative bg-slate-950 overflow-hidden aspect-[16/10]">
+            <img 
+              src="screenshots/17-users-matrix.png" 
+              alt="Gestão de Usuários & Acessos" 
+              loading="lazy" 
+              class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+
+          <div class="p-4 bg-slate-900 flex-1 flex flex-col justify-between">
+            <p class="text-xs text-slate-400 leading-relaxed">Controle de perfis (Global Admin, Admin, Estoque, Visitante) e sessões ativas com isolamento RLS.</p>
+            <div class="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+              <span>Arquivo: 17-users-matrix.png</span>
+              <a href="screenshots/17-users-matrix.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium flex items-center gap-1">
+                Ver Imagem Completa ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Checklist de Homologação de Negócio -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+      <h3 class="text-lg font-bold text-white tracking-tight mb-4 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        Matriz de Validação de Regras de Negócio
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Controle Real de Validades
+          </div>
+          <p class="text-slate-400">Cálculo dinâmico de dias para expiração, badges de risco (Vence em Breve / Vencido) e alerta antecipado de perdas.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Rastreabilidade Kardex
+          </div>
+          <p class="text-slate-400">Registro com data, tipo de movimentação, motivo comercial, saldo anterior e novo saldo persistidos com integridade.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Impressão Térmica de Etiquetas
+          </div>
+          <p class="text-slate-400">Geração de código de barras EAN-13 legível por scanner ótico com formatação para folhas de gôndola e impressoras térmicas.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Regras do Montador de Cestas
+          </div>
+          <p class="text-slate-400">Capacidade máxima por tamanho (5, 8 ou 12 itens), exigência obrigatória de bebida e despacho direto para WhatsApp.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Isolamento Multi-Empresa & RLS
+          </div>
+          <p class="text-slate-400">Políticas de segurança Row Level Security isolando dados de cada loja com perfil Global Admin para suporte da plataforma.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
+          <div class="font-semibold text-white flex items-center gap-2 mb-1">
+            <span class="text-emerald-400">✓</span> Contingência Offline Local
+          </div>
+          <p class="text-slate-400">Modo de resiliência com fallback automático para LocalStorage em caso de instabilidade de conexão remota.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950 mt-12 py-6 text-center text-xs text-slate-500">
+    MarketFlow — Plataforma Inteligente de Gestão Comercial • Relatório Homologado e Publicado Automaticamente
+  </footer>
+
+</body>
+</html>

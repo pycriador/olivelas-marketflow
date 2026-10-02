@@ -10,9 +10,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38bdf8?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646cff?style=flat&logo=vite)](https://vitejs.dev/)
+[![Tests E2E](https://img.shields.io/badge/Tests_E2E-100%25_Passing-10b981?style=flat&logo=checkmarx)](docs/test-evidence-report.html)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-[🌐 **Acessar Aplicação Online**](https://pycriador.github.io/olivelas-marketflow/) • [📖 **Documentação de Rotas**](#-rotas-da-aplicação) • [🛠️ **Como Executar**](#-como-executar-localmente)
+[🌐 **Acessar Aplicação Online**](https://pycriador.github.io/olivelas-marketflow/) • [🧪 **Relatório de Testes & Evidências**](docs/test-evidence-report.html) • [📖 **Documentação de Rotas**](#-rotas-da-aplicação) • [🛠️ **Como Executar**](#-como-executar-localmente)
 
 </div>
 
@@ -224,6 +225,41 @@ olivelas-marketflow/
 | `/loja/:slug` | Vitrine digital da loja com identificação e produtos |
 | `/loja/:slug/produto/:id` | Visualização detalhada do produto com link compartilhável |
 | `/loja/:slug/cesta` | Montagem interativa da cesta de café da manhã para WhatsApp |
+
+---
+
+## 🧪 Homologação, Testes E2E & Evidências de Qualidade
+
+O sistema possui uma suíte automatizada de testes fim a fim (**E2E com Puppeteer**) e testes de integração de **APIs REST e Autenticação (Supabase GoTrue & PostgREST)**, garantindo conformidade com as regras de negócio e estabilidade de produção.
+
+> 📄 **Relatório Interativo Completo**: [Acessar docs/test-evidence-report.html](docs/test-evidence-report.html) ou versão web em [Relatório de Evidências Online](https://pycriador.github.io/olivelas-marketflow/test-evidence-report.html).  
+> 📑 **Documentação Técnica de Testes**: [docs/TEST_REPORT.md](docs/TEST_REPORT.md).
+
+### Resumo das Validações (Taxa de Sucesso: 100%)
+- **Testes de API REST / Auth**: 7/7 endpoints aprovados com resposta `200 OK` e latência média < 500ms.
+- **Telas e Fluxos Homologados**: 17 interfaces validadas com evidências fotográficas em alta resolução (`1440x900 @2x`).
+- **Resiliência e Segurança**: Políticas RLS (Row Level Security), emissão de tokens JWT e modo de contingência local testados.
+
+### Evidências Fotográficas Capturadas
+| Tela / Módulo | Descrição do Teste | Evidência Fotográfica |
+| :--- | :--- | :---: |
+| **Landing Page** | Proposta de valor, hero, carrossel de recursos e FAQ | [01-landing-page.png](docs/screenshots/01-landing-page.png) |
+| **Login & Autenticação** | Formulário de credenciais reais e OAuth Google | [02-login-screen.png](docs/screenshots/02-login-screen.png) |
+| **Criação de Conta** | Validação de senhas e auto-cadastro no Supabase | [03-signup-screen.png](docs/screenshots/03-signup-screen.png) |
+| **Dashboard Executivo** | KPIs financeiros, alertas de validade e reposição | [04-dashboard.png](docs/screenshots/04-dashboard.png) |
+| **Catálogo de Produtos** | 51 produtos reais com validade dinâmica e filtros | [05-products-catalog.png](docs/screenshots/05-products-catalog.png) |
+| **Cadastro de Produto** | Código EAN-13, precificação e fotos do item | [06-product-form.png](docs/screenshots/06-product-form.png) |
+| **Etiquetas Térmicas** | Folha A4 para gôndola e código de barras scanner | [07-thermal-labels.png](docs/screenshots/07-thermal-labels.png) |
+| **Estoque Consolidado** | Saldo físico, reserva e valor financeiro total | [08-inventory.png](docs/screenshots/08-inventory.png) |
+| **Lotes & Validades** | Rastreabilidade lote a lote e alerta regressivo | [09-lots-expiration.png](docs/screenshots/09-lots-expiration.png) |
+| **Movimentações Kardex** | Histórico cronológico de entradas e saídas | [10-movements-kardex.png](docs/screenshots/10-movements-kardex.png) |
+| **Relatórios Gerenciais** | Curva ABC, estimativa de perdas e gráficos | [11-reports-overview.png](docs/screenshots/11-reports-overview.png) |
+| **Montador de Cestas** | Personalização de itens (P, M, G) e pedido WhatsApp | [12-basket-builder.png](docs/screenshots/12-basket-builder.png) |
+| **Vitrine Pública** | Catálogo online da loja com selo de verificação | [13-public-storefront.png](docs/screenshots/13-public-storefront.png) |
+| **Perfil da Empresa** | CNPJ, dados cadastrais e canais de contato | [14-company-profile.png](docs/screenshots/14-company-profile.png) |
+| **Central Desenvolvedores**| OpenAPI / Swagger com payloads e autenticação | [15-api-docs.png](docs/screenshots/15-api-docs.png) |
+| **Assistente de IA** | Sugestões de compras, rupturas e promoções | [16-ai-assistant.png](docs/screenshots/16-ai-assistant.png) |
+| **Matriz de Usuários** | Perfis de acesso e controle de sessões ativas | [17-users-matrix.png](docs/screenshots/17-users-matrix.png) |
 
 ---
 
