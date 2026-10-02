@@ -32,6 +32,11 @@ A documentação está dividida em 6 pilares temáticos. Utilize os links abaixo
 ### 🎨 6. Interface, Design System e Internacionalização
 - [01. Design System, 20 Temas Dinâmicos e i18n](frontend/01-design-system-e-temas.md) — Injeção de variáveis CSS, suporte Dark/Light e dicionários em PT-BR, EN e ES.
 
+### 🧪 7. Homologação, Testes E2E e Evidências Visuais
+- [01. Catálogo Completo de Evidências Visuais](EVIDENCIAS_VISUAIS.md) — Galeria com todas as 17 telas em alta definição, critérios e dados de homologação.
+- [02. Relatório Técnico de Testes & APIs](TEST_REPORT.md) — Matriz de testes automatizados Puppeteer, latências de endpoints Supabase e 100% pass rate.
+- [03. Relatório Interativo em HTML](test-evidence-report.html) — Dashboard executivo visual independente com filtros e métricas.
+
 ---
 
 ## 🧭 Diagrama de Interconectividade da Wiki

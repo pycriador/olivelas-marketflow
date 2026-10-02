@@ -40,6 +40,7 @@ interface LandingPageProps {
   onNavigateSignup?: () => void;
   onNavigateCatalogDemo: () => void;
   onNavigateBasketDemo?: () => void;
+  onNavigateEvidence?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
@@ -47,6 +48,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onNavigateSignup = onNavigateLogin,
   onNavigateCatalogDemo,
   onNavigateBasketDemo,
+  onNavigateEvidence,
 }) => {
   // Helper para montar caminhos de assets estáticos garantindo compatibilidade com GitHub Pages e local
   const getAssetUrl = (path: string) => {
@@ -186,14 +188,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
           </div>
 
-          <nav className="hidden lg:flex items-center space-x-7 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <nav className="hidden lg:flex items-center space-x-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <a href="#telas" className="hover:text-primary transition-colors">Telas & Usabilidade</a>
             <a href="#recursos" className="hover:text-primary transition-colors">Módulos</a>
             <a href="#ia" className="hover:text-primary transition-colors">IA Multimodal</a>
             <a href="#cestas" className="hover:text-primary transition-colors">Cestas & Catálogo</a>
-            <a href="#comparativo" className="hover:text-primary transition-colors">Comparativo</a>
+            <a href="#homologacao" className="hover:text-primary transition-colors">Homologação</a>
             <a href="#planos" className="hover:text-primary transition-colors">Planos</a>
             <a href="#faq" className="hover:text-primary transition-colors">Dúvidas</a>
+            {onNavigateEvidence && (
+              <button
+                type="button"
+                onClick={onNavigateEvidence}
+                className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" /> Evidências (100% OK)
+              </button>
+            )}
           </nav>
 
           <div className="flex items-center space-x-2.5">
@@ -230,11 +241,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <Button size="lg" onClick={onNavigateSignup} className="w-full sm:w-auto h-13 px-8 text-sm font-bold shadow-lg">
               Começar Gratuitamente <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+            {onNavigateEvidence && (
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={onNavigateEvidence}
+                className="w-full sm:w-auto h-13 px-6 text-sm font-semibold border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10"
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-500" /> Evidências de Testes
+              </Button>
+            )}
             <a
               href="#telas"
               className="inline-flex items-center justify-center h-13 px-6 text-sm font-semibold rounded-md border border-input bg-card hover:bg-accent transition-colors w-full sm:w-auto"
             >
-              <Laptop className="mr-2 h-4 w-4 text-primary" /> Explorar Telas do Sistema
+              <Laptop className="mr-2 h-4 w-4 text-primary" /> Explorar Telas
             </a>
             <Button
               size="lg"
@@ -242,7 +263,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onNavigateCatalogDemo}
               className="w-full sm:w-auto h-13 px-6 text-sm font-semibold"
             >
-              <Store className="mr-2 h-4 w-4 text-emerald-600" /> Vitrine de Demonstração
+              <Store className="mr-2 h-4 w-4 text-emerald-600" /> Vitrine Demo
             </Button>
           </div>
 
@@ -775,8 +796,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* 8.5. Homologação & Selo de Qualidade (`#homologacao`) */}
+      <section id="homologacao" className="py-16 bg-gradient-to-b from-muted/30 to-background border-y">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border bg-card/80 backdrop-blur p-8 sm:p-10 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>Qualidade Garantida • Suíte Automatizada E2E</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                Plataforma 100% Testada e Homologada em Produção
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Todas as 17 interfaces do sistema, rotas de API no PostgreSQL (Supabase) e regras de negócio foram validadas de ponta a ponta com testes automatizados via Puppeteer, gerando evidências visuais em alta resolução.
+              </p>
+              <div className="flex flex-wrap gap-4 text-xs font-semibold text-foreground pt-1">
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 24 Testes Aprovados</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 17 Telas Evidenciadas</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> 7 APIs REST 200 OK</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Zero Falhas (100% Pass)</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+              {onNavigateEvidence && (
+                <Button size="lg" onClick={onNavigateEvidence} className="h-12 px-6 font-bold shadow-md bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Shield className="mr-2 h-4 w-4" /> Acessar Página de Evidências
+                </Button>
+              )}
+              <a
+                href={getAssetUrl('test-evidence-report.html')}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center h-12 px-6 text-xs font-semibold rounded-md border bg-muted/60 hover:bg-muted transition text-muted-foreground hover:text-foreground"
+              >
+                Abrir Relatório HTML Oficial ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 9. FAQ (`#faq`) */}
-      <section id="faq" className="py-20 bg-muted/30 border-y">
+      <section id="faq" className="py-20 bg-muted/30 border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="text-center space-y-3">
             <Badge variant="secondary" className="uppercase font-bold text-[10px]">Tire Suas Dúvidas</Badge>
@@ -887,6 +950,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     Ver Loja Demonstrativa
                   </button>
                 </li>
+                {onNavigateEvidence && (
+                  <li>
+                    <button onClick={onNavigateEvidence} className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Evidências de Testes (QA)
+                    </button>
+                  </li>
+                )}
                 <li>
                   <a
                     href="https://github.com/pycriador/olivelas-marketflow"

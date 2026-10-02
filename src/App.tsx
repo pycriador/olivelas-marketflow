@@ -38,6 +38,7 @@ import { dataStore } from './lib/data-store';
 import { LoginPage } from './pages/auth/login';
 import { PublicStorePage } from './pages/public/public-store';
 import { LandingPage } from './pages/public/landing-page';
+import { TestEvidencePage } from './pages/public/test-evidence-page';
 import { Product } from './types';
 
 const GITHUB_REPO_PREFIX = '/olivelas-marketflow';
@@ -179,6 +180,16 @@ export const App: React.FC = () => {
     );
   }
 
+  // Tratamento da Página de Evidências de Testes e Homologação
+  if (currentPath === '/evidencias' || currentPath === '/testes') {
+    return (
+      <TestEvidencePage
+        onBack={() => navigate('/landing')}
+        onNavigateLogin={() => navigate('/login')}
+      />
+    );
+  }
+
   // Tratamento da Landing Page Pública
   if (currentPath === '/landing' || (!isAuthenticated && (currentPath === '/' || currentPath === ''))) {
     return (
@@ -187,6 +198,7 @@ export const App: React.FC = () => {
         onNavigateSignup={() => navigate('/cadastro')}
         onNavigateCatalogDemo={() => navigate('/loja/cestas-cafe-da-manha')}
         onNavigateBasketDemo={() => navigate('/loja/cestas-cafe-da-manha/cesta')}
+        onNavigateEvidence={() => navigate('/evidencias')}
       />
     );
   }

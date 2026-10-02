@@ -232,7 +232,9 @@ olivelas-marketflow/
 
 O sistema possui uma suíte automatizada de testes fim a fim (**E2E com Puppeteer**) e testes de integração de **APIs REST e Autenticação (Supabase GoTrue & PostgREST)**, garantindo conformidade com as regras de negócio e estabilidade de produção.
 
-> 📄 **Relatório Interativo Completo**: [Acessar docs/test-evidence-report.html](docs/test-evidence-report.html) ou versão web em [Relatório de Evidências Online](https://pycriador.github.io/olivelas-marketflow/test-evidence-report.html).  
+> 📸 **Catálogo Completo de Evidências em Markdown**: [docs/EVIDENCIAS_VISUAIS.md](docs/EVIDENCIAS_VISUAIS.md) (Todas as 17 capturas renderizadas com detalhes técnicos).  
+> 🌐 **Página de Evidências na Aplicação**: [Acessar /evidencias no MarketFlow](https://pycriador.github.io/olivelas-marketflow/evidencias) (Navegação interativa por abas e categorias).  
+> 📄 **Relatório Interativo Completo em HTML**: [docs/test-evidence-report.html](docs/test-evidence-report.html) ou versão web em [Relatório de Evidências Online](https://pycriador.github.io/olivelas-marketflow/test-evidence-report.html).  
 > 📑 **Documentação Técnica de Testes**: [docs/TEST_REPORT.md](docs/TEST_REPORT.md).
 
 ### Resumo das Validações (Taxa de Sucesso: 100%)
