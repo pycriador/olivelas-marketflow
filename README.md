@@ -265,6 +265,33 @@ O sistema possui uma suíte automatizada de testes fim a fim (**E2E com Puppetee
 
 ---
 
+### 🕹️ Playbook de Automação em Loja de Teste (Portabilidade Externa)
+
+Criamos uma especificação canônica passo a passo para permitir a automação da jornada completa em qualquer outra ferramenta (Playwright, Cypress, Selenium, Postman ou Robot Framework):
+
+- 📋 **Especificação BDD & Roteiro**: [`tests/e2e-playbook/ROTEIRO_TESTES_E2E.md`](tests/e2e-playbook/ROTEIRO_TESTES_E2E.md)
+- 💻 **Script Executável**: [`tests/e2e-playbook/scripts/run-store-lifecycle-test.mjs`](tests/e2e-playbook/scripts/run-store-lifecycle-test.mjs)
+- 📊 **Resumo de Execução**: [`tests/e2e-playbook/results/execution-summary.json`](tests/e2e-playbook/results/execution-summary.json)
+- 📄 **Relatório Local Interativo**: [`tests/e2e-playbook/results/execution-report.html`](tests/e2e-playbook/results/execution-report.html)
+- 📑 **Documentação Detalhada**: [`docs/ROTEIRO_EXECUCAO_LOJA_TESTE.md`](docs/ROTEIRO_EXECUCAO_LOJA_TESTE.md)
+
+**Jornada de Negócio Coberta:**
+1. Provisionamento e ativação da loja de teste (`Empório Teste E2E` / `comp-teste-e2e`);
+2. Cadastro de novos produtos com código EAN-13, margem e regras de perecibilidade;
+3. Entrada de estoque (+50 unidades) e abertura de lotes rastreáveis com validade;
+4. Execução de venda comercial de balcão (baixa de 2 Cafés e 1 Suco), atualizando saldos para 48 e 49 unidades;
+5. Auditoria das movimentações de entrada e saída no livro Kardex;
+6. Geração de etiquetas de gôndola e código de barras legível por leitor;
+7. Acesso à vitrine digital pública da nova loja e teste do montador de cestas com bebida obrigatória;
+8. Homologação com 0 erros de runtime em 100% das telas da plataforma.
+
+Para rodar o roteiro e regravar os resultados localmente:
+```bash
+node tests/e2e-playbook/scripts/run-store-lifecycle-test.mjs
+```
+
+---
+
 ## 💻 Como Executar Localmente
 
 ### Pré-requisitos

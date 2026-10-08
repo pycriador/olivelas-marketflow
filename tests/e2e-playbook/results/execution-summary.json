@@ -1,0 +1,359 @@
+{
+  "title": "MarketFlow E2E Playbook — Execução em Loja de Teste",
+  "environment": "Localhost (Vite) + Supabase Multi-Tenant DataStore",
+  "executedAt": "2026-10-08T02:07:38.510Z",
+  "totalSteps": 17,
+  "passedSteps": 17,
+  "failedSteps": 0,
+  "totalDurationSeconds": "43.08",
+  "testCompany": {
+    "id": "comp-teste-e2e",
+    "name": "Empório Teste E2E",
+    "legal_name": "Empório e Conveniência Teste E2E Ltda",
+    "cnpj": "12.345.678/0001-99",
+    "slug": "emporio-teste-e2e",
+    "email": "willian.o.jesus@gmail.com",
+    "phone": "(11) 99999-8888",
+    "whatsapp": "5511999998888",
+    "description": "Loja de testes automatizados E2E para validação de ciclo completo de vida comercial.",
+    "subtitulo": "Produtos selecionados e cestas sob medida",
+    "moeda": "BRL",
+    "breakfast_basket_enabled": true,
+    "active": true,
+    "created_at": "2026-10-08T02:06:55.336Z",
+    "updated_at": "2026-10-08T02:06:55.337Z"
+  },
+  "testProducts": [
+    {
+      "id": "prod-cafe-especial-500",
+      "company_id": "comp-teste-e2e",
+      "category_id": "cat-mercearia",
+      "brand_id": "brand-cafe-gourmet",
+      "name": "Café Gourmet Especial em Grãos 500g",
+      "description": "Café 100% arábica de torra média com notas florais e chocolate.",
+      "price": 34.9,
+      "cost_price": 18,
+      "barcode": "7891000123456",
+      "shelf_life_days": 180,
+      "expiration_date": "2027-04-06",
+      "is_perishable": true,
+      "is_breakfast_basket": true,
+      "min_stock": 10,
+      "active": true,
+      "created_at": "2026-10-08T02:06:55.337Z",
+      "updated_at": "2026-10-08T02:06:55.337Z"
+    },
+    {
+      "id": "prod-suco-uva-1l",
+      "company_id": "comp-teste-e2e",
+      "category_id": "cat-bebidas",
+      "brand_id": "brand-aurora",
+      "name": "Suco Natural de Uva Integral 1L",
+      "description": "Suco de uva tinto integral sem adição de açúcar e sem conservantes.",
+      "price": 18.5,
+      "cost_price": 9.5,
+      "barcode": "7892000654321",
+      "shelf_life_days": 360,
+      "expiration_date": "2027-10-03",
+      "is_perishable": true,
+      "is_breakfast_basket": true,
+      "is_beverage": true,
+      "bottle_capacity": "1000ml",
+      "min_stock": 15,
+      "active": true,
+      "created_at": "2026-10-08T02:06:55.337Z",
+      "updated_at": "2026-10-08T02:06:55.337Z"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "title": "Autenticação e Provisionamento da Loja de Teste",
+      "filename": "step01_loja_criada_e_selecionada.png",
+      "screenshotPath": "screenshots/step01_loja_criada_e_selecionada.png",
+      "description": "Loja \"Empório Teste E2E\" (comp-teste-e2e) provisionada como empresa ativa com credenciais de administrador.",
+      "durationMs": 1457,
+      "timestamp": "2026-10-08T02:07:02.627Z",
+      "status": "Aprovado",
+      "data": {
+        "company": {
+          "id": "comp-teste-e2e",
+          "name": "Empório Teste E2E",
+          "legal_name": "Empório e Conveniência Teste E2E Ltda",
+          "cnpj": "12.345.678/0001-99",
+          "slug": "emporio-teste-e2e",
+          "email": "willian.o.jesus@gmail.com",
+          "phone": "(11) 99999-8888",
+          "whatsapp": "5511999998888",
+          "description": "Loja de testes automatizados E2E para validação de ciclo completo de vida comercial.",
+          "subtitulo": "Produtos selecionados e cestas sob medida",
+          "moeda": "BRL",
+          "breakfast_basket_enabled": true,
+          "active": true,
+          "created_at": "2026-10-08T02:06:55.336Z",
+          "updated_at": "2026-10-08T02:06:55.337Z"
+        }
+      }
+    },
+    {
+      "step": 2,
+      "title": "Cadastro do Produto 1: Café Gourmet 500g",
+      "filename": "step02_produto_cafe_cadastrado.png",
+      "screenshotPath": "screenshots/step02_produto_cafe_cadastrado.png",
+      "description": "Produto \"Café Gourmet Especial em Grãos 500g\" cadastrado com EAN 7891000123456, preço R$ 34,90 e margem de 93,8%.",
+      "durationMs": 1194,
+      "timestamp": "2026-10-08T02:07:04.454Z",
+      "status": "Aprovado",
+      "data": {
+        "product": {
+          "id": "prod-cafe-especial-500",
+          "company_id": "comp-teste-e2e",
+          "category_id": "cat-mercearia",
+          "brand_id": "brand-cafe-gourmet",
+          "name": "Café Gourmet Especial em Grãos 500g",
+          "description": "Café 100% arábica de torra média com notas florais e chocolate.",
+          "price": 34.9,
+          "cost_price": 18,
+          "barcode": "7891000123456",
+          "shelf_life_days": 180,
+          "expiration_date": "2027-04-06",
+          "is_perishable": true,
+          "is_breakfast_basket": true,
+          "min_stock": 10,
+          "active": true,
+          "created_at": "2026-10-08T02:06:55.337Z",
+          "updated_at": "2026-10-08T02:06:55.337Z"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "title": "Cadastro do Produto 2: Suco de Uva Integral 1L",
+      "filename": "step03_produto_suco_cadastrado.png",
+      "screenshotPath": "screenshots/step03_produto_suco_cadastrado.png",
+      "description": "Produto \"Suco Natural de Uva Integral 1L\" cadastrado com EAN 7892000654321, preço R$ 18,50 e classificado como bebida.",
+      "durationMs": 1192,
+      "timestamp": "2026-10-08T02:07:06.272Z",
+      "status": "Aprovado",
+      "data": {
+        "product": {
+          "id": "prod-suco-uva-1l",
+          "company_id": "comp-teste-e2e",
+          "category_id": "cat-bebidas",
+          "brand_id": "brand-aurora",
+          "name": "Suco Natural de Uva Integral 1L",
+          "description": "Suco de uva tinto integral sem adição de açúcar e sem conservantes.",
+          "price": 18.5,
+          "cost_price": 9.5,
+          "barcode": "7892000654321",
+          "shelf_life_days": 360,
+          "expiration_date": "2027-10-03",
+          "is_perishable": true,
+          "is_breakfast_basket": true,
+          "is_beverage": true,
+          "bottle_capacity": "1000ml",
+          "min_stock": 15,
+          "active": true,
+          "created_at": "2026-10-08T02:06:55.337Z",
+          "updated_at": "2026-10-08T02:06:55.337Z"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "title": "Entrada de Estoque (+50 unidades) e Lotes Ativos",
+      "filename": "step04_lote_e_estoque_abastecido.png",
+      "screenshotPath": "screenshots/step04_lote_e_estoque_abastecido.png",
+      "description": "Estoque abastecido com 50 unidades de Café e 50 unidades de Suco. Lotes criados com validades calculadas (+180d e +360d).",
+      "durationMs": 1252,
+      "timestamp": "2026-10-08T02:07:08.161Z",
+      "status": "Aprovado",
+      "data": {
+        "estoqueInicial": 50,
+        "lotes": [
+          {
+            "id": "lot-cafe-1791425226272",
+            "company_id": "comp-teste-e2e",
+            "product_id": "prod-cafe-especial-500",
+            "lot_number": "LOTE-CAF-2026-A1",
+            "manufacturing_date": "2026-09-01",
+            "expiration_date": "2027-04-06",
+            "initial_quantity": 50,
+            "current_quantity": 50,
+            "created_at": "2026-10-08T02:07:06.272Z",
+            "updated_at": "2026-10-08T02:07:06.272Z"
+          },
+          {
+            "id": "lot-suco-1791425226272",
+            "company_id": "comp-teste-e2e",
+            "product_id": "prod-suco-uva-1l",
+            "lot_number": "LOTE-UVA-2026-B2",
+            "manufacturing_date": "2026-09-15",
+            "expiration_date": "2027-10-03",
+            "initial_quantity": 50,
+            "current_quantity": 50,
+            "created_at": "2026-10-08T02:07:06.273Z",
+            "updated_at": "2026-10-08T02:07:06.273Z"
+          }
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "title": "Venda Comercial Realizada (Saldos: 48 e 49 un)",
+      "filename": "step05_venda_realizada_saida_estoque.png",
+      "screenshotPath": "screenshots/step05_venda_realizada_saida_estoque.png",
+      "description": "Venda comercial de 2 Cafés (R$ 69,80) e 1 Suco (R$ 18,50) processada com sucesso. Saldo reduzido para 48 e 49 unidades.",
+      "durationMs": 1076,
+      "timestamp": "2026-10-08T02:07:09.881Z",
+      "status": "Aprovado",
+      "data": {
+        "venda": {
+          "itens": [
+            {
+              "id": "prod-cafe-especial-500",
+              "qtd": 2
+            },
+            {
+              "id": "prod-suco-uva-1l",
+              "qtd": 1
+            }
+          ],
+          "valorTotal": 88.3
+        }
+      }
+    },
+    {
+      "step": 6,
+      "title": "Auditoria no Livro Kardex de Movimentações",
+      "filename": "step06_kardex_movimentacoes_confirmadas.png",
+      "screenshotPath": "screenshots/step06_kardex_movimentacoes_confirmadas.png",
+      "description": "Histórico completo auditado: Entradas iniciais (+50 un) e Saídas por venda (-2 un e -1 un) registradas com timestamp.",
+      "durationMs": 1062,
+      "timestamp": "2026-10-08T02:07:11.563Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 7,
+      "title": "Emissão de Etiquetas Térmicas com Código EAN-13",
+      "filename": "step07_etiquetas_termicas_geradas.png",
+      "screenshotPath": "screenshots/step07_etiquetas_termicas_geradas.png",
+      "description": "Etiquetas de gôndola emitidas para os novos produtos contendo código de barras legível, preço formatado e dados da loja.",
+      "durationMs": 1057,
+      "timestamp": "2026-10-08T02:07:13.245Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 8,
+      "title": "Vitrine Digital Pública da Loja de Teste",
+      "filename": "step08_vitrine_publica_loja_teste.png",
+      "screenshotPath": "screenshots/step08_vitrine_publica_loja_teste.png",
+      "description": "Catálogo online para clientes finais em /loja/emporio-teste-e2e com selo verificado e produtos recém-cadastrados.",
+      "durationMs": 1077,
+      "timestamp": "2026-10-08T02:07:14.962Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 9,
+      "title": "Montador Interativo de Cestas de Presentes",
+      "filename": "step09_montador_cestas_loja_teste.png",
+      "screenshotPath": "screenshots/step09_montador_cestas_loja_teste.png",
+      "description": "Fluxo do cliente para montagem de cesta personalizada incluindo validação de bebida obrigatória e envio ao WhatsApp.",
+      "durationMs": 1069,
+      "timestamp": "2026-10-08T02:07:16.656Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 10,
+      "title": "Dashboard Executivo 360°",
+      "filename": "step10_dashboard_kpis_atualizados.png",
+      "screenshotPath": "screenshots/step10_dashboard_kpis_atualizados.png",
+      "description": "Métricas financeiras atualizadas com a nova loja e alertas operacionais.",
+      "durationMs": 1037,
+      "timestamp": "2026-10-08T02:07:18.312Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 11,
+      "title": "Gestão de Lotes & Validades",
+      "filename": "step11_lots_expiration_loja_teste.png",
+      "screenshotPath": "screenshots/step11_lots_expiration_loja_teste.png",
+      "description": "Lotes da loja de teste exibindo dias restantes e cálculo de risco sanitário.",
+      "durationMs": 1040,
+      "timestamp": "2026-10-08T02:07:19.982Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 12,
+      "title": "Relatórios Gerenciais & Curva ABC",
+      "filename": "step12_relatorios_gerenciais.png",
+      "screenshotPath": "screenshots/step12_relatorios_gerenciais.png",
+      "description": "Relatórios de giro e curva de faturamento.",
+      "durationMs": 1029,
+      "timestamp": "2026-10-08T02:07:21.639Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 13,
+      "title": "Perfil da Empresa & Configurações",
+      "filename": "step13_perfil_empresa_configurado.png",
+      "screenshotPath": "screenshots/step13_perfil_empresa_configurado.png",
+      "description": "Dados cadastrais da loja de teste (CNPJ, Razão Social, WhatsApp).",
+      "durationMs": 1031,
+      "timestamp": "2026-10-08T02:07:23.299Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 14,
+      "title": "Central de Desenvolvedores & API Docs",
+      "filename": "step14_api_docs_swagger.png",
+      "screenshotPath": "screenshots/step14_api_docs_swagger.png",
+      "description": "Documentação OpenAPI/Swagger com endpoints para integrações externas.",
+      "durationMs": 1053,
+      "timestamp": "2026-10-08T02:07:24.973Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 15,
+      "title": "Assistente Inteligente com IA",
+      "filename": "step15_assistente_ia_analise.png",
+      "screenshotPath": "screenshots/step15_assistente_ia_analise.png",
+      "description": "Copiloto de IA para análise do estoque da loja de teste e sugestões.",
+      "durationMs": 1038,
+      "timestamp": "2026-10-08T02:07:26.668Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 16,
+      "title": "Gestão de Usuários & Acessos",
+      "filename": "step16_gestao_usuarios_seguranca.png",
+      "screenshotPath": "screenshots/step16_gestao_usuarios_seguranca.png",
+      "description": "Controle de papéis e permissões (RBAC) com isolamento multi-tenant.",
+      "durationMs": 1703,
+      "timestamp": "2026-10-08T02:07:28.993Z",
+      "status": "Aprovado",
+      "data": null
+    },
+    {
+      "step": 17,
+      "title": "Central Oficial de Evidências de Testes",
+      "filename": "step17_central_evidencias_plataforma.png",
+      "screenshotPath": "screenshots/step17_central_evidencias_plataforma.png",
+      "description": "Página interna da plataforma consolidando o selo de homologação 100%.",
+      "durationMs": 8879,
+      "timestamp": "2026-10-08T02:07:38.510Z",
+      "status": "Aprovado",
+      "data": null
+    }
+  ]
+}

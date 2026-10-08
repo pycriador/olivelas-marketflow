@@ -36,6 +36,7 @@ A documentação está dividida em 6 pilares temáticos. Utilize os links abaixo
 - [01. Catálogo Completo de Evidências Visuais](EVIDENCIAS_VISUAIS.md) — Galeria com todas as 17 telas em alta definição, critérios e dados de homologação.
 - [02. Relatório Técnico de Testes & APIs](TEST_REPORT.md) — Matriz de testes automatizados Puppeteer, latências de endpoints Supabase e 100% pass rate.
 - [03. Relatório Interativo em HTML](test-evidence-report.html) — Dashboard executivo visual independente com filtros e métricas.
+- [04. Playbook & Roteiro E2E em Loja de Teste](ROTEIRO_EXECUCAO_LOJA_TESTE.md) — Jornada de provisionamento, produtos, estoque, venda e auditoria para automação externa.
 
 ---
 

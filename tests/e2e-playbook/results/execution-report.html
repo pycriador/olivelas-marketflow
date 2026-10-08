@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketFlow — Relatório de Execução do Roteiro E2E (Loja de Teste)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-lg">
+          M
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            MarketFlow <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Store Lifecycle E2E</span>
+          </h1>
+          <p class="text-xs text-slate-400">Roteiro de Teste em Loja Criada: Produtos, Estoque, Venda e Telas</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          17/17 Passos Concluídos (100%)
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <!-- Sumário -->
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Loja de Teste Criada</span>
+          <p class="text-lg font-bold text-white mt-1">Empório Teste E2E</p>
+          <p class="text-xs text-slate-400 font-mono mt-0.5">CNPJ: 12.345.678/0001-99</p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Produtos Cadastrados</span>
+          <p class="text-lg font-bold text-blue-400 mt-1">2 Novos Itens</p>
+          <p class="text-xs text-slate-400 mt-0.5">Café Especial & Suco Integral</p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Operações de Estoque</span>
+          <p class="text-lg font-bold text-purple-400 mt-1">Entrada 50 un • Venda 3 un</p>
+          <p class="text-xs text-slate-400 mt-0.5">Saldos Finais: 48 e 49 un</p>
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase">Tempo de Execução</span>
+          <p class="text-lg font-bold text-amber-400 mt-1">43.08s</p>
+          <p class="text-xs text-slate-400 mt-0.5">17 telas homologadas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Galeria de Passos e Evidências -->
+    <section class="space-y-6">
+      <h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+        Evidências da Jornada Operacional (17 Etapas)
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  1
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Autenticação e Provisionamento da Loja de Teste</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step01_loja_criada_e_selecionada.png" alt="Autenticação e Provisionamento da Loja de Teste" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Loja "Empório Teste E2E" (comp-teste-e2e) provisionada como empresa ativa com credenciais de administrador.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step01_loja_criada_e_selecionada.png</span>
+                <a href="screenshots/step01_loja_criada_e_selecionada.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  2
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Cadastro do Produto 1: Café Gourmet 500g</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step02_produto_cafe_cadastrado.png" alt="Cadastro do Produto 1: Café Gourmet 500g" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Produto "Café Gourmet Especial em Grãos 500g" cadastrado com EAN 7891000123456, preço R$ 34,90 e margem de 93,8%.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step02_produto_cafe_cadastrado.png</span>
+                <a href="screenshots/step02_produto_cafe_cadastrado.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  3
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Cadastro do Produto 2: Suco de Uva Integral 1L</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step03_produto_suco_cadastrado.png" alt="Cadastro do Produto 2: Suco de Uva Integral 1L" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Produto "Suco Natural de Uva Integral 1L" cadastrado com EAN 7892000654321, preço R$ 18,50 e classificado como bebida.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step03_produto_suco_cadastrado.png</span>
+                <a href="screenshots/step03_produto_suco_cadastrado.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  4
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Entrada de Estoque (+50 unidades) e Lotes Ativos</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step04_lote_e_estoque_abastecido.png" alt="Entrada de Estoque (+50 unidades) e Lotes Ativos" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Estoque abastecido com 50 unidades de Café e 50 unidades de Suco. Lotes criados com validades calculadas (+180d e +360d).</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step04_lote_e_estoque_abastecido.png</span>
+                <a href="screenshots/step04_lote_e_estoque_abastecido.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  5
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Venda Comercial Realizada (Saldos: 48 e 49 un)</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step05_venda_realizada_saida_estoque.png" alt="Venda Comercial Realizada (Saldos: 48 e 49 un)" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Venda comercial de 2 Cafés (R$ 69,80) e 1 Suco (R$ 18,50) processada com sucesso. Saldo reduzido para 48 e 49 unidades.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step05_venda_realizada_saida_estoque.png</span>
+                <a href="screenshots/step05_venda_realizada_saida_estoque.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  6
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Auditoria no Livro Kardex de Movimentações</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step06_kardex_movimentacoes_confirmadas.png" alt="Auditoria no Livro Kardex de Movimentações" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Histórico completo auditado: Entradas iniciais (+50 un) e Saídas por venda (-2 un e -1 un) registradas com timestamp.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step06_kardex_movimentacoes_confirmadas.png</span>
+                <a href="screenshots/step06_kardex_movimentacoes_confirmadas.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  7
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Emissão de Etiquetas Térmicas com Código EAN-13</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step07_etiquetas_termicas_geradas.png" alt="Emissão de Etiquetas Térmicas com Código EAN-13" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Etiquetas de gôndola emitidas para os novos produtos contendo código de barras legível, preço formatado e dados da loja.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step07_etiquetas_termicas_geradas.png</span>
+                <a href="screenshots/step07_etiquetas_termicas_geradas.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  8
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Vitrine Digital Pública da Loja de Teste</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step08_vitrine_publica_loja_teste.png" alt="Vitrine Digital Pública da Loja de Teste" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Catálogo online para clientes finais em /loja/emporio-teste-e2e com selo verificado e produtos recém-cadastrados.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step08_vitrine_publica_loja_teste.png</span>
+                <a href="screenshots/step08_vitrine_publica_loja_teste.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  9
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Montador Interativo de Cestas de Presentes</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step09_montador_cestas_loja_teste.png" alt="Montador Interativo de Cestas de Presentes" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Fluxo do cliente para montagem de cesta personalizada incluindo validação de bebida obrigatória e envio ao WhatsApp.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step09_montador_cestas_loja_teste.png</span>
+                <a href="screenshots/step09_montador_cestas_loja_teste.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  10
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Dashboard Executivo 360°</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step10_dashboard_kpis_atualizados.png" alt="Dashboard Executivo 360°" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Métricas financeiras atualizadas com a nova loja e alertas operacionais.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step10_dashboard_kpis_atualizados.png</span>
+                <a href="screenshots/step10_dashboard_kpis_atualizados.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  11
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Gestão de Lotes & Validades</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step11_lots_expiration_loja_teste.png" alt="Gestão de Lotes & Validades" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Lotes da loja de teste exibindo dias restantes e cálculo de risco sanitário.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step11_lots_expiration_loja_teste.png</span>
+                <a href="screenshots/step11_lots_expiration_loja_teste.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  12
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Relatórios Gerenciais & Curva ABC</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step12_relatorios_gerenciais.png" alt="Relatórios Gerenciais & Curva ABC" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Relatórios de giro e curva de faturamento.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step12_relatorios_gerenciais.png</span>
+                <a href="screenshots/step12_relatorios_gerenciais.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  13
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Perfil da Empresa & Configurações</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step13_perfil_empresa_configurado.png" alt="Perfil da Empresa & Configurações" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Dados cadastrais da loja de teste (CNPJ, Razão Social, WhatsApp).</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step13_perfil_empresa_configurado.png</span>
+                <a href="screenshots/step13_perfil_empresa_configurado.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  14
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Central de Desenvolvedores & API Docs</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step14_api_docs_swagger.png" alt="Central de Desenvolvedores & API Docs" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Documentação OpenAPI/Swagger com endpoints para integrações externas.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step14_api_docs_swagger.png</span>
+                <a href="screenshots/step14_api_docs_swagger.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  15
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Assistente Inteligente com IA</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step15_assistente_ia_analise.png" alt="Assistente Inteligente com IA" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Copiloto de IA para análise do estoque da loja de teste e sugestões.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step15_assistente_ia_analise.png</span>
+                <a href="screenshots/step15_assistente_ia_analise.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  16
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Gestão de Usuários & Acessos</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step16_gestao_usuarios_seguranca.png" alt="Gestão de Usuários & Acessos" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Controle de papéis e permissões (RBAC) com isolamento multi-tenant.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step16_gestao_usuarios_seguranca.png</span>
+                <a href="screenshots/step16_gestao_usuarios_seguranca.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md flex flex-col group hover:border-slate-700 transition">
+            <div class="p-3.5 border-b border-slate-800 bg-slate-950/60 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center justify-center">
+                  17
+                </span>
+                <h3 class="font-bold text-xs text-white truncate max-w-[200px]">Central Oficial de Evidências de Testes</h3>
+              </div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                ✓ Aprovado
+              </span>
+            </div>
+
+            <div class="relative bg-slate-950 aspect-[16/10] overflow-hidden">
+              <img src="screenshots/step17_central_evidencias_plataforma.png" alt="Central Oficial de Evidências de Testes" loading="lazy" class="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105" />
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-slate-900">
+              <p class="text-xs text-slate-400 leading-relaxed">Página interna da plataforma consolidando o selo de homologação 100%.</p>
+              <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>step17_central_evidencias_plataforma.png</span>
+                <a href="screenshots/step17_central_evidencias_plataforma.png" target="_blank" class="text-blue-400 hover:text-blue-300 font-sans font-medium">Ampliar ↗</a>
+              </div>
+            </div>
+          </div>
+        
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950 mt-12 py-6 text-center text-xs text-slate-500">
+    MarketFlow — Roteiro de Testes Automatizado Gravado Localmente • 07/10/2026, 23:07:38
+  </footer>
+
+</body>
+</html>
