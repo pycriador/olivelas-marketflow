@@ -3,6 +3,7 @@ import { spawn } from 'child_process';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import { getPuppeteerLaunchOptions } from './browser-resolver.mjs';
 
 // Carregar variáveis do .env
 let envUrl = '';
@@ -628,10 +629,13 @@ async function main() {
 
     // Inicia Puppeteer
     console.log('\n🌐 Inicializando navegador headless Puppeteer...');
-    browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    const launchOptions = getPuppeteerLaunchOptions();
+    if (launchOptions.executablePath) {
+      console.log(`🌐 Navegador detectado no sistema: ${launchOptions.executablePath}`);
+    } else {
+      console.log('🌐 Navegador do sistema não encontrado. Utilizando cache padrão do Puppeteer...');
+    }
+    browser = await puppeteer.launch(launchOptions);
 
     // Executa testes de UI e tira screenshots
     const uiResults = await runUiTests(browser);

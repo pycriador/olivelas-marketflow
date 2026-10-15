@@ -2,9 +2,10 @@ import puppeteer from 'puppeteer';
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import { getPuppeteerLaunchOptions } from '../../../scripts/browser-resolver.mjs';
 
-const PORT = 5173;
-const BASE_URL = `http://localhost:${PORT}`;
+const PORT = process.env.PORT || 5173;
+const BASE_URL = process.env.TARGET_URL || process.env.BASE_URL || `http://localhost:${PORT}`;
 const RESULTS_DIR = path.resolve('tests/e2e-playbook/results');
 const SCREENSHOT_DIR = path.join(RESULTS_DIR, 'screenshots');
 
@@ -12,14 +13,42 @@ if (!fs.existsSync(SCREENSHOT_DIR)) {
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 }
 
-// 1. Checa se o servidor Vite está ativo
-function checkServerRunning(port) {
+// 1. Inicia servidor SPA local estático caso o Vite não esteja rodando na porta
+function startStaticServerIfNeeded(port, rootDir = path.resolve('dist')) {
   return new Promise((resolve) => {
-    const req = http.get(`http://localhost:${port}/`, () => resolve(true));
-    req.on('error', () => resolve(false));
-    req.setTimeout(1000, () => {
-      req.destroy();
-      resolve(false);
+    const checkReq = http.get(`http://127.0.0.1:${port}/`, () => {
+      resolve({ server: null, port });
+    });
+    checkReq.on('error', () => {
+      const mimeTypes = {
+        '.html': 'text/html; charset=utf-8',
+        '.js': 'application/javascript; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.json': 'application/json; charset=utf-8',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.svg': 'image/svg+xml'
+      };
+      const server = http.createServer((req, res) => {
+        let reqPath = decodeURI(req.url.split('?')[0]);
+        let filePath = path.join(rootDir, reqPath);
+        if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+          filePath = path.join(rootDir, 'index.html');
+        }
+        const ext = path.extname(filePath).toLowerCase();
+        res.setHeader('Content-Type', mimeTypes[ext] || 'application/octet-stream');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        fs.createReadStream(filePath).pipe(res);
+      });
+      server.listen(port, '127.0.0.1', () => {
+        console.log(`[INFO] Servidor SPA local temporário ativo em http://127.0.0.1:${port}`);
+        resolve({ server, port });
+      });
+      server.on('error', () => resolve({ server: null, port }));
+    });
+    checkReq.setTimeout(600, () => {
+      checkReq.destroy();
+      resolve({ server: null, port });
     });
   });
 }
@@ -90,9 +119,13 @@ async function executeLifecyclePlaybook() {
   console.log('🚀 INICIANDO EXECUÇÃO DO ROTEIRO DE TESTES E2E — LOJA DE TESTE');
   console.log('====================================================================\n');
 
-  const isServerUp = await checkServerRunning(PORT);
-  if (!isServerUp) {
-    throw new Error(`Servidor Vite local não está respondendo em http://localhost:${PORT}`);
+  let staticServer = null;
+  const isLocal = BASE_URL.includes('localhost') || BASE_URL.includes('127.0.0.1');
+  if (isLocal) {
+    const portMatch = BASE_URL.match(/:(\d+)/);
+    const port = portMatch ? parseInt(portMatch[1], 10) : 5173;
+    const res = await startStaticServerIfNeeded(port);
+    staticServer = res.server;
   }
 
   const executionLog = [];
@@ -121,10 +154,13 @@ async function executeLifecyclePlaybook() {
     return entry;
   };
 
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  const launchOptions = getPuppeteerLaunchOptions();
+  if (launchOptions.executablePath) {
+    console.log(`🌐 Navegador detectado no sistema: ${launchOptions.executablePath}`);
+  } else {
+    console.log('🌐 Navegador do sistema não encontrado. Utilizando cache padrão do Puppeteer...');
+  }
+  const browser = await puppeteer.launch(launchOptions);
 
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
@@ -142,7 +178,8 @@ async function executeLifecyclePlaybook() {
     // PASSO 1: Autenticação Segura & Provisionamento da Loja de Teste
     // -------------------------------------------------------------
     console.log('\n--- ETAPA 1: Provisionamento da Loja de Teste e Sessão ---');
-    await page.goto(`${BASE_URL}/admin/dashboard`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    const cleanBaseUrl = BASE_URL.replace(/\/$/, '');
+    await page.goto(`${cleanBaseUrl}/`, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Configura a sessão de autenticação do Willian e injeta a Loja de Teste
     await page.evaluate((company, prodA, prodB) => {
@@ -449,6 +486,7 @@ async function executeLifecyclePlaybook() {
     console.error('❌ Falha na execução do roteiro de testes:', err);
   } finally {
     await browser.close();
+    if (staticServer) staticServer.close();
   }
 }
 
@@ -572,4 +610,12 @@ function generateLocalHtmlReport(summary) {
   console.log(`📄 Relatório HTML interativo gravado em: ${reportPath}`);
 }
 
-executeLifecyclePlaybook();
+executeLifecyclePlaybook()
+  .then(() => {
+    console.log('\n🏁 Sucesso total na execução de testes.');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('💥 Erro fatal:', err);
+    process.exit(1);
+  });

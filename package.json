@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test:e2e": "node tests/e2e-playbook/scripts/run-store-lifecycle-test.mjs",
+    "test": "node tests/e2e-playbook/scripts/run-store-lifecycle-test.mjs",
     "build": "tsc && vite build",
     "build:gh-pages": "vite build --base=/olivelas-marketflow/",
     "lint": "eslint .",

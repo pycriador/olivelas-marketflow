@@ -1,11 +1,11 @@
 {
   "title": "MarketFlow E2E Playbook — Execução em Loja de Teste",
   "environment": "Localhost (Vite) + Supabase Multi-Tenant DataStore",
-  "executedAt": "2026-10-08T02:07:38.510Z",
+  "executedAt": "2026-10-15T16:09:47.678Z",
   "totalSteps": 17,
   "passedSteps": 17,
   "failedSteps": 0,
-  "totalDurationSeconds": "43.08",
+  "totalDurationSeconds": "29.52",
   "testCompany": {
     "id": "comp-teste-e2e",
     "name": "Empório Teste E2E",
@@ -20,8 +20,8 @@
     "moeda": "BRL",
     "breakfast_basket_enabled": true,
     "active": true,
-    "created_at": "2026-10-08T02:06:55.336Z",
-    "updated_at": "2026-10-08T02:06:55.337Z"
+    "created_at": "2026-10-15T16:09:18.129Z",
+    "updated_at": "2026-10-15T16:09:18.130Z"
   },
   "testProducts": [
     {
@@ -35,13 +35,13 @@
       "cost_price": 18,
       "barcode": "7891000123456",
       "shelf_life_days": 180,
-      "expiration_date": "2027-04-06",
+      "expiration_date": "2027-04-13",
       "is_perishable": true,
       "is_breakfast_basket": true,
       "min_stock": 10,
       "active": true,
-      "created_at": "2026-10-08T02:06:55.337Z",
-      "updated_at": "2026-10-08T02:06:55.337Z"
+      "created_at": "2026-10-15T16:09:18.130Z",
+      "updated_at": "2026-10-15T16:09:18.130Z"
     },
     {
       "id": "prod-suco-uva-1l",
@@ -54,15 +54,15 @@
       "cost_price": 9.5,
       "barcode": "7892000654321",
       "shelf_life_days": 360,
-      "expiration_date": "2027-10-03",
+      "expiration_date": "2027-10-10",
       "is_perishable": true,
       "is_breakfast_basket": true,
       "is_beverage": true,
       "bottle_capacity": "1000ml",
       "min_stock": 15,
       "active": true,
-      "created_at": "2026-10-08T02:06:55.337Z",
-      "updated_at": "2026-10-08T02:06:55.337Z"
+      "created_at": "2026-10-15T16:09:18.130Z",
+      "updated_at": "2026-10-15T16:09:18.130Z"
     }
   ],
   "steps": [
@@ -72,8 +72,8 @@
       "filename": "step01_loja_criada_e_selecionada.png",
       "screenshotPath": "screenshots/step01_loja_criada_e_selecionada.png",
       "description": "Loja \"Empório Teste E2E\" (comp-teste-e2e) provisionada como empresa ativa com credenciais de administrador.",
-      "durationMs": 1457,
-      "timestamp": "2026-10-08T02:07:02.627Z",
+      "durationMs": 1055,
+      "timestamp": "2026-10-15T16:09:21.371Z",
       "status": "Aprovado",
       "data": {
         "company": {
@@ -90,8 +90,8 @@
           "moeda": "BRL",
           "breakfast_basket_enabled": true,
           "active": true,
-          "created_at": "2026-10-08T02:06:55.336Z",
-          "updated_at": "2026-10-08T02:06:55.337Z"
+          "created_at": "2026-10-15T16:09:18.129Z",
+          "updated_at": "2026-10-15T16:09:18.130Z"
         }
       }
     },
@@ -101,8 +101,8 @@
       "filename": "step02_produto_cafe_cadastrado.png",
       "screenshotPath": "screenshots/step02_produto_cafe_cadastrado.png",
       "description": "Produto \"Café Gourmet Especial em Grãos 500g\" cadastrado com EAN 7891000123456, preço R$ 34,90 e margem de 93,8%.",
-      "durationMs": 1194,
-      "timestamp": "2026-10-08T02:07:04.454Z",
+      "durationMs": 986,
+      "timestamp": "2026-10-15T16:09:22.974Z",
       "status": "Aprovado",
       "data": {
         "product": {
@@ -116,13 +116,13 @@
           "cost_price": 18,
           "barcode": "7891000123456",
           "shelf_life_days": 180,
-          "expiration_date": "2027-04-06",
+          "expiration_date": "2027-04-13",
           "is_perishable": true,
           "is_breakfast_basket": true,
           "min_stock": 10,
           "active": true,
-          "created_at": "2026-10-08T02:06:55.337Z",
-          "updated_at": "2026-10-08T02:06:55.337Z"
+          "created_at": "2026-10-15T16:09:18.130Z",
+          "updated_at": "2026-10-15T16:09:18.130Z"
         }
       }
     },
@@ -132,8 +132,8 @@
       "filename": "step03_produto_suco_cadastrado.png",
       "screenshotPath": "screenshots/step03_produto_suco_cadastrado.png",
       "description": "Produto \"Suco Natural de Uva Integral 1L\" cadastrado com EAN 7892000654321, preço R$ 18,50 e classificado como bebida.",
-      "durationMs": 1192,
-      "timestamp": "2026-10-08T02:07:06.272Z",
+      "durationMs": 1042,
+      "timestamp": "2026-10-15T16:09:24.635Z",
       "status": "Aprovado",
       "data": {
         "product": {
@@ -147,15 +147,15 @@
           "cost_price": 9.5,
           "barcode": "7892000654321",
           "shelf_life_days": 360,
-          "expiration_date": "2027-10-03",
+          "expiration_date": "2027-10-10",
           "is_perishable": true,
           "is_breakfast_basket": true,
           "is_beverage": true,
           "bottle_capacity": "1000ml",
           "min_stock": 15,
           "active": true,
-          "created_at": "2026-10-08T02:06:55.337Z",
-          "updated_at": "2026-10-08T02:06:55.337Z"
+          "created_at": "2026-10-15T16:09:18.130Z",
+          "updated_at": "2026-10-15T16:09:18.130Z"
         }
       }
     },
@@ -165,35 +165,35 @@
       "filename": "step04_lote_e_estoque_abastecido.png",
       "screenshotPath": "screenshots/step04_lote_e_estoque_abastecido.png",
       "description": "Estoque abastecido com 50 unidades de Café e 50 unidades de Suco. Lotes criados com validades calculadas (+180d e +360d).",
-      "durationMs": 1252,
-      "timestamp": "2026-10-08T02:07:08.161Z",
+      "durationMs": 1004,
+      "timestamp": "2026-10-15T16:09:26.259Z",
       "status": "Aprovado",
       "data": {
         "estoqueInicial": 50,
         "lotes": [
           {
-            "id": "lot-cafe-1791425226272",
+            "id": "lot-cafe-1792080564635",
             "company_id": "comp-teste-e2e",
             "product_id": "prod-cafe-especial-500",
             "lot_number": "LOTE-CAF-2026-A1",
             "manufacturing_date": "2026-09-01",
-            "expiration_date": "2027-04-06",
+            "expiration_date": "2027-04-13",
             "initial_quantity": 50,
             "current_quantity": 50,
-            "created_at": "2026-10-08T02:07:06.272Z",
-            "updated_at": "2026-10-08T02:07:06.272Z"
+            "created_at": "2026-10-15T16:09:24.636Z",
+            "updated_at": "2026-10-15T16:09:24.636Z"
           },
           {
-            "id": "lot-suco-1791425226272",
+            "id": "lot-suco-1792080564636",
             "company_id": "comp-teste-e2e",
             "product_id": "prod-suco-uva-1l",
             "lot_number": "LOTE-UVA-2026-B2",
             "manufacturing_date": "2026-09-15",
-            "expiration_date": "2027-10-03",
+            "expiration_date": "2027-10-10",
             "initial_quantity": 50,
             "current_quantity": 50,
-            "created_at": "2026-10-08T02:07:06.273Z",
-            "updated_at": "2026-10-08T02:07:06.273Z"
+            "created_at": "2026-10-15T16:09:24.636Z",
+            "updated_at": "2026-10-15T16:09:24.636Z"
           }
         ]
       }
@@ -204,8 +204,8 @@
       "filename": "step05_venda_realizada_saida_estoque.png",
       "screenshotPath": "screenshots/step05_venda_realizada_saida_estoque.png",
       "description": "Venda comercial de 2 Cafés (R$ 69,80) e 1 Suco (R$ 18,50) processada com sucesso. Saldo reduzido para 48 e 49 unidades.",
-      "durationMs": 1076,
-      "timestamp": "2026-10-08T02:07:09.881Z",
+      "durationMs": 1060,
+      "timestamp": "2026-10-15T16:09:27.934Z",
       "status": "Aprovado",
       "data": {
         "venda": {
@@ -229,8 +229,8 @@
       "filename": "step06_kardex_movimentacoes_confirmadas.png",
       "screenshotPath": "screenshots/step06_kardex_movimentacoes_confirmadas.png",
       "description": "Histórico completo auditado: Entradas iniciais (+50 un) e Saídas por venda (-2 un e -1 un) registradas com timestamp.",
-      "durationMs": 1062,
-      "timestamp": "2026-10-08T02:07:11.563Z",
+      "durationMs": 1022,
+      "timestamp": "2026-10-15T16:09:29.578Z",
       "status": "Aprovado",
       "data": null
     },
@@ -240,8 +240,8 @@
       "filename": "step07_etiquetas_termicas_geradas.png",
       "screenshotPath": "screenshots/step07_etiquetas_termicas_geradas.png",
       "description": "Etiquetas de gôndola emitidas para os novos produtos contendo código de barras legível, preço formatado e dados da loja.",
-      "durationMs": 1057,
-      "timestamp": "2026-10-08T02:07:13.245Z",
+      "durationMs": 987,
+      "timestamp": "2026-10-15T16:09:31.178Z",
       "status": "Aprovado",
       "data": null
     },
@@ -251,8 +251,8 @@
       "filename": "step08_vitrine_publica_loja_teste.png",
       "screenshotPath": "screenshots/step08_vitrine_publica_loja_teste.png",
       "description": "Catálogo online para clientes finais em /loja/emporio-teste-e2e com selo verificado e produtos recém-cadastrados.",
-      "durationMs": 1077,
-      "timestamp": "2026-10-08T02:07:14.962Z",
+      "durationMs": 984,
+      "timestamp": "2026-10-15T16:09:32.772Z",
       "status": "Aprovado",
       "data": null
     },
@@ -262,8 +262,8 @@
       "filename": "step09_montador_cestas_loja_teste.png",
       "screenshotPath": "screenshots/step09_montador_cestas_loja_teste.png",
       "description": "Fluxo do cliente para montagem de cesta personalizada incluindo validação de bebida obrigatória e envio ao WhatsApp.",
-      "durationMs": 1069,
-      "timestamp": "2026-10-08T02:07:16.656Z",
+      "durationMs": 1002,
+      "timestamp": "2026-10-15T16:09:34.392Z",
       "status": "Aprovado",
       "data": null
     },
@@ -273,8 +273,8 @@
       "filename": "step10_dashboard_kpis_atualizados.png",
       "screenshotPath": "screenshots/step10_dashboard_kpis_atualizados.png",
       "description": "Métricas financeiras atualizadas com a nova loja e alertas operacionais.",
-      "durationMs": 1037,
-      "timestamp": "2026-10-08T02:07:18.312Z",
+      "durationMs": 1077,
+      "timestamp": "2026-10-15T16:09:36.094Z",
       "status": "Aprovado",
       "data": null
     },
@@ -284,8 +284,8 @@
       "filename": "step11_lots_expiration_loja_teste.png",
       "screenshotPath": "screenshots/step11_lots_expiration_loja_teste.png",
       "description": "Lotes da loja de teste exibindo dias restantes e cálculo de risco sanitário.",
-      "durationMs": 1040,
-      "timestamp": "2026-10-08T02:07:19.982Z",
+      "durationMs": 1057,
+      "timestamp": "2026-10-15T16:09:37.777Z",
       "status": "Aprovado",
       "data": null
     },
@@ -295,8 +295,8 @@
       "filename": "step12_relatorios_gerenciais.png",
       "screenshotPath": "screenshots/step12_relatorios_gerenciais.png",
       "description": "Relatórios de giro e curva de faturamento.",
-      "durationMs": 1029,
-      "timestamp": "2026-10-08T02:07:21.639Z",
+      "durationMs": 1040,
+      "timestamp": "2026-10-15T16:09:39.444Z",
       "status": "Aprovado",
       "data": null
     },
@@ -306,8 +306,8 @@
       "filename": "step13_perfil_empresa_configurado.png",
       "screenshotPath": "screenshots/step13_perfil_empresa_configurado.png",
       "description": "Dados cadastrais da loja de teste (CNPJ, Razão Social, WhatsApp).",
-      "durationMs": 1031,
-      "timestamp": "2026-10-08T02:07:23.299Z",
+      "durationMs": 1084,
+      "timestamp": "2026-10-15T16:09:41.156Z",
       "status": "Aprovado",
       "data": null
     },
@@ -317,8 +317,8 @@
       "filename": "step14_api_docs_swagger.png",
       "screenshotPath": "screenshots/step14_api_docs_swagger.png",
       "description": "Documentação OpenAPI/Swagger com endpoints para integrações externas.",
-      "durationMs": 1053,
-      "timestamp": "2026-10-08T02:07:24.973Z",
+      "durationMs": 1001,
+      "timestamp": "2026-10-15T16:09:42.772Z",
       "status": "Aprovado",
       "data": null
     },
@@ -328,8 +328,8 @@
       "filename": "step15_assistente_ia_analise.png",
       "screenshotPath": "screenshots/step15_assistente_ia_analise.png",
       "description": "Copiloto de IA para análise do estoque da loja de teste e sugestões.",
-      "durationMs": 1038,
-      "timestamp": "2026-10-08T02:07:26.668Z",
+      "durationMs": 1043,
+      "timestamp": "2026-10-15T16:09:44.431Z",
       "status": "Aprovado",
       "data": null
     },
@@ -339,8 +339,8 @@
       "filename": "step16_gestao_usuarios_seguranca.png",
       "screenshotPath": "screenshots/step16_gestao_usuarios_seguranca.png",
       "description": "Controle de papéis e permissões (RBAC) com isolamento multi-tenant.",
-      "durationMs": 1703,
-      "timestamp": "2026-10-08T02:07:28.993Z",
+      "durationMs": 1000,
+      "timestamp": "2026-10-15T16:09:46.051Z",
       "status": "Aprovado",
       "data": null
     },
@@ -350,8 +350,8 @@
       "filename": "step17_central_evidencias_plataforma.png",
       "screenshotPath": "screenshots/step17_central_evidencias_plataforma.png",
       "description": "Página interna da plataforma consolidando o selo de homologação 100%.",
-      "durationMs": 8879,
-      "timestamp": "2026-10-08T02:07:38.510Z",
+      "durationMs": 1004,
+      "timestamp": "2026-10-15T16:09:47.678Z",
       "status": "Aprovado",
       "data": null
     }
