@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs';
 import {
   OFFICIAL_BREAKFAST_BASKET_JSON,
   REAL_COMPANY,
+  getRealCategories,
   getRealBrands,
   getRealProducts,
   getRealExpirationDate
@@ -20,6 +21,34 @@ function escapeJson(obj: any): string {
 function generate() {
   const brands = getRealBrands(REAL_COMPANY.id);
   const products = getRealProducts(REAL_COMPANY.id);
+  const realCategories = getRealCategories(REAL_COMPANY.id);
+  const extraCategories = [
+    { id: 'cat-padaria', name: 'Padaria & Confeitaria', description: 'Pães especiais, torradas, croissants, bolos e waffles' },
+    { id: 'cat-frios', name: 'Frios & Laticínios', description: 'Queijos selecionados, iogurtes, manteigas e requeijão' },
+    { id: 'cat-geleias', name: 'Geleias & Doces', description: 'Geleias artesanais, mel puro, cremes e chocolates' },
+    { id: 'cat-flores', name: 'Flores & Afeto', description: 'Arranjos florais compactos e botões de rosas naturais' },
+    { id: 'cat-canecas', name: 'Canecas & Lembranças', description: 'Canecas de cerâmica, xícaras especiais e cartões comemorativos' },
+    { id: 'cat-embalagens', name: 'Cestas & Embalagens', description: 'Cestas de vime rústico, caixas cartonadas premium e laços' },
+  ];
+  const allCategoriesMap = new Map<string, { id: string, name: string, description: string }>();
+  for (const c of realCategories) {
+    allCategoriesMap.set(c.id, { id: c.id, name: c.name, description: c.description || '' });
+  }
+  for (const c of extraCategories) {
+    if (!allCategoriesMap.has(c.id)) {
+      allCategoriesMap.set(c.id, c);
+    }
+  }
+  for (const p of products) {
+    if (p.category_id && !allCategoriesMap.has(p.category_id)) {
+      allCategoriesMap.set(p.category_id, {
+        id: p.category_id,
+        name: p.category_id.replace('cat-', '').replace(/-/g, ' ').toUpperCase(),
+        description: 'Categoria de produtos'
+      });
+    }
+  }
+  const allCategories = Array.from(allCategoriesMap.values());
 
   let sql = `-- ====================================================================
 -- MarketFlow — Dedicated Database Schema & Complete Seed Data
@@ -370,19 +399,9 @@ ON CONFLICT (id) DO UPDATE SET
   whatsapp = EXCLUDED.whatsapp,
   description = EXCLUDED.description;
 
--- 2. Categorias Oficiais
+-- 2. Categorias Oficiais (${allCategories.length} categorias)
 INSERT INTO marketflow.categories (id, company_id, name, description, active) VALUES
-('cat-mercearia-cafe', ${escapeSql(REAL_COMPANY.id)}, 'Cafés & Matinais', 'Cafés especiais, chás e matinais', true),
-('cat-bebidas', ${escapeSql(REAL_COMPANY.id)}, 'Bebidas', 'Sucos, achocolatados, cafés prontos, chás e espumantes', true),
-('cat-padaria', ${escapeSql(REAL_COMPANY.id)}, 'Padaria & Confeitaria', 'Pães especiais, torradas, croissants, bolos e waffles', true),
-('cat-frios', ${escapeSql(REAL_COMPANY.id)}, 'Frios & Laticínios', 'Queijos selecionados, iogurtes, manteigas e requeijão', true),
-('cat-biscoitos', ${escapeSql(REAL_COMPANY.id)}, 'Biscoitos & Snacks', 'Cookies artesanais, biscoitos finos, crackers e nuts', true),
-('cat-frutas', ${escapeSql(REAL_COMPANY.id)}, 'Frutas Frescas', 'Frutas higienizadas e selecionadas para consumo imediato', true),
-('cat-geleias', ${escapeSql(REAL_COMPANY.id)}, 'Geleias & Doces', 'Geleias artesanais, mel puro, cremes e chocolates', true),
-('cat-flores', ${escapeSql(REAL_COMPANY.id)}, 'Flores & Afeto', 'Arranjos florais compactos e botões de rosas naturais', true),
-('cat-canecas', ${escapeSql(REAL_COMPANY.id)}, 'Canecas & Lembranças', 'Canecas de cerâmica, xícaras especiais e cartões comemorativos', true),
-('cat-embalagens', ${escapeSql(REAL_COMPANY.id)}, 'Cestas & Embalagens', 'Cestas de vime rústico, caixas cartonadas premium e laços', true),
-('cat-adicionais', ${escapeSql(REAL_COMPANY.id)}, 'Adicionais & Acessórios', 'Itens complementares e brindes decorativos', true)
+${allCategories.map(c => `(${escapeSql(c.id)}, ${escapeSql(REAL_COMPANY.id)}, ${escapeSql(c.name)}, ${escapeSql(c.description)}, true)`).join(',\n')}
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 
 -- 3. Marcas Oficiais (${brands.length} marcas)
@@ -492,7 +511,20 @@ INSERT INTO marketflow.products (
 
   writeFileSync('supabase/marketflow_schema.sql', sql, 'utf-8');
   writeFileSync('supabase/consolidated_schema.sql', sql, 'utf-8');
-  console.log(`✅ Gerados supabase/marketflow_schema.sql e supabase/consolidated_schema.sql no schema "marketflow" com ${products.length} produtos e ${brands.length} marcas.`);
+
+  // Separar em parte 1 (Estrutura DDL) e parte 2 (Seed Data)
+  const splitMarker = '-- 1. Empresa Principal';
+  const parts = sql.split(splitMarker);
+  const part1 = parts[0].trim();
+  const part2 = (splitMarker + '\n' + parts[1]).trim();
+
+  writeFileSync('supabase/01_marketflow_structure.sql', part1, 'utf-8');
+  writeFileSync('supabase/02_marketflow_data.sql', part2, 'utf-8');
+
+  console.log(`✅ Gerados com sucesso:`);
+  console.log(`   - supabase/marketflow_schema.sql (Completo)`);
+  console.log(`   - supabase/01_marketflow_structure.sql (Estrutura/Tabelas/RLS)`);
+  console.log(`   - supabase/02_marketflow_data.sql (Empresa, Categorias, ${products.length} Produtos, Lotes e Estoque)`);
 }
 
 generate();

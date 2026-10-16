@@ -347,19 +347,22 @@ ON CONFLICT (id) DO UPDATE SET
   whatsapp = EXCLUDED.whatsapp,
   description = EXCLUDED.description;
 
--- 2. Categorias Oficiais
+-- 2. Categorias Oficiais (14 categorias)
 INSERT INTO marketflow.categories (id, company_id, name, description, active) VALUES
-('cat-mercearia-cafe', 'comp-cesta-1', 'Cafés & Matinais', 'Cafés especiais, chás e matinais', true),
-('cat-bebidas', 'comp-cesta-1', 'Bebidas', 'Sucos, achocolatados, cafés prontos, chás e espumantes', true),
+('cat-bebidas', 'comp-cesta-1', 'Bebidas', 'Conta no limite de itens da cesta', true),
+('cat-paes-bolos', 'comp-cesta-1', 'Pães & Bolos', 'Conta no limite de itens da cesta', true),
+('cat-biscoitos', 'comp-cesta-1', 'Biscoitos & Bolachas', 'Conta no limite de itens da cesta', true),
+('cat-frios-queijos', 'comp-cesta-1', 'Frios & Queijos', 'Conta no limite de itens da cesta', true),
+('cat-doces-geleias', 'comp-cesta-1', 'Doces & Geleias', 'Conta no limite de itens da cesta', true),
+('cat-frutas', 'comp-cesta-1', 'Frutas', 'Conta no limite de itens da cesta', true),
+('cat-mercearia-cafe', 'comp-cesta-1', 'Café & Mercearia', 'Conta no limite de itens da cesta', true),
+('cat-adicionais', 'comp-cesta-1', 'Adicionais (opcional, à parte)', 'Opcional, à parte (não conta no limite)', true),
 ('cat-padaria', 'comp-cesta-1', 'Padaria & Confeitaria', 'Pães especiais, torradas, croissants, bolos e waffles', true),
 ('cat-frios', 'comp-cesta-1', 'Frios & Laticínios', 'Queijos selecionados, iogurtes, manteigas e requeijão', true),
-('cat-biscoitos', 'comp-cesta-1', 'Biscoitos & Snacks', 'Cookies artesanais, biscoitos finos, crackers e nuts', true),
-('cat-frutas', 'comp-cesta-1', 'Frutas Frescas', 'Frutas higienizadas e selecionadas para consumo imediato', true),
 ('cat-geleias', 'comp-cesta-1', 'Geleias & Doces', 'Geleias artesanais, mel puro, cremes e chocolates', true),
 ('cat-flores', 'comp-cesta-1', 'Flores & Afeto', 'Arranjos florais compactos e botões de rosas naturais', true),
 ('cat-canecas', 'comp-cesta-1', 'Canecas & Lembranças', 'Canecas de cerâmica, xícaras especiais e cartões comemorativos', true),
-('cat-embalagens', 'comp-cesta-1', 'Cestas & Embalagens', 'Cestas de vime rústico, caixas cartonadas premium e laços', true),
-('cat-adicionais', 'comp-cesta-1', 'Adicionais & Acessórios', 'Itens complementares e brindes decorativos', true)
+('cat-embalagens', 'comp-cesta-1', 'Cestas & Embalagens', 'Cestas de vime rústico, caixas cartonadas premium e laços', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 
 -- 3. Marcas Oficiais (39 marcas)
