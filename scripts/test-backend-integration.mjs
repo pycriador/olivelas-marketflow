@@ -1,8 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
-const url = process.env.SUPABASE_URL || 'https://mfyyezvpfpflpekosjif.supabase.co';
-const anonKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
-const secretKey = process.env.SUPABASE_SECRET_KEY || '';
+let envUrl = process.env.SUPABASE_URL || '';
+let envAnonKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
+let envSecretKey = process.env.SUPABASE_SECRET_KEY || '';
+
+try {
+  const envContent = fs.readFileSync('.env', 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const [k, ...v] = line.trim().split('=');
+    const val = v.join('=').trim();
+    if ((k === 'VITE_SUPABASE_URL' || k === 'SUPABASE_URL') && !envUrl) envUrl = val;
+    if ((k === 'VITE_SUPABASE_ANON_KEY' || k === 'SUPABASE_PUBLISHABLE_KEY') && !envAnonKey) envAnonKey = val;
+    if (k === 'SUPABASE_SECRET_KEY' && !envSecretKey) envSecretKey = val;
+  }
+} catch {}
+
+const url = envUrl || 'https://mfyyezvpfpflpekosjif.supabase.co';
+const anonKey = envAnonKey || '';
+const secretKey = envSecretKey || '';
 
 console.log('====================================================');
 console.log('MarketFlow — Backend Integration Verification Suite');
@@ -11,6 +28,7 @@ console.log('====================================================\n');
 
 async function runTests() {
   const client = createClient(url, secretKey || anonKey, {
+    db: { schema: 'marketflow' },
     auth: { persistSession: false }
   });
 
