@@ -1,19 +1,33 @@
 -- ====================================================================
--- MarketFlow — Consolidated Database Schema & Complete Seed Data
+-- MarketFlow — Dedicated Database Schema & Complete Seed Data
 -- Target Database: Supabase PostgreSQL (project: mfyyezvpfpflpekosjif)
+-- Dedicated Schema: "marketflow" (Isolamento total de outros projetos como serviceforge)
 -- ====================================================================
+
+-- 0. Criar Schema Dedicado "marketflow"
+CREATE SCHEMA IF NOT EXISTS marketflow;
+
+-- Conceder permissões no schema para os papéis de acesso do Supabase
+GRANT USAGE ON SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA marketflow TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 
 -- 1. Custom Types & Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 DO $$ BEGIN
-  CREATE TYPE public.app_role AS ENUM ('global_admin', 'admin', 'stock', 'visitor');
+  CREATE TYPE marketflow.app_role AS ENUM ('global_admin', 'admin', 'stock', 'visitor');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
 
 -- 2. Profiles (Linked to auth.users)
-CREATE TABLE IF NOT EXISTS public.profiles (
+CREATE TABLE IF NOT EXISTS marketflow.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name VARCHAR(150) NOT NULL,
   avatar_url TEXT,
@@ -23,10 +37,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 -- Trigger: auto-create profile on auth.users sign up
-CREATE OR REPLACE FUNCTION public.handle_new_user()
+CREATE OR REPLACE FUNCTION marketflow.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, avatar_url, phone)
+  INSERT INTO marketflow.profiles (id, full_name, avatar_url, phone)
   VALUES (
     new.id,
     COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
@@ -40,19 +54,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created_marketflow ON auth.users;
+CREATE TRIGGER on_auth_user_created_marketflow
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  FOR EACH ROW EXECUTE FUNCTION marketflow.handle_new_user();
 
 -- Auto-create profile for any existing auth.users
-INSERT INTO public.profiles (id, full_name, created_at, updated_at)
+INSERT INTO marketflow.profiles (id, full_name, created_at, updated_at)
 SELECT id, COALESCE(raw_user_meta_data->>'full_name', split_part(email, '@', 1)), now(), now()
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Companies (Tenants)
-CREATE TABLE IF NOT EXISTS public.companies (
+CREATE TABLE IF NOT EXISTS marketflow.companies (
   id TEXT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   legal_name VARCHAR(200),
@@ -68,31 +82,31 @@ CREATE TABLE IF NOT EXISTS public.companies (
   avisoRodape TEXT,
   breakfast_basket_enabled BOOLEAN NOT NULL DEFAULT true,
   active BOOLEAN NOT NULL DEFAULT true,
-  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES marketflow.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ
 );
 
 -- 4. Company Users (Tenant Membership & Roles)
-CREATE TABLE IF NOT EXISTS public.company_users (
+CREATE TABLE IF NOT EXISTS marketflow.company_users (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  role public.app_role NOT NULL DEFAULT 'admin',
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES marketflow.profiles(id) ON DELETE CASCADE,
+  role marketflow.app_role NOT NULL DEFAULT 'admin',
   active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT unique_company_user UNIQUE(company_id, user_id)
+  CONSTRAINT unique_company_user_mf UNIQUE(company_id, user_id)
 );
 
 -- 5. Categories
-CREATE TABLE IF NOT EXISTS public.categories (
+CREATE TABLE IF NOT EXISTS marketflow.categories (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(100) NOT NULL,
   description TEXT,
-  parent_id TEXT REFERENCES public.categories(id) ON DELETE SET NULL,
+  parent_id TEXT REFERENCES marketflow.categories(id) ON DELETE SET NULL,
   image_url TEXT,
   active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -101,9 +115,9 @@ CREATE TABLE IF NOT EXISTS public.categories (
 );
 
 -- 6. Manufacturers (Fabricantes)
-CREATE TABLE IF NOT EXISTS public.manufacturers (
+CREATE TABLE IF NOT EXISTS marketflow.manufacturers (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(150) NOT NULL,
   document VARCHAR(30),
   phone VARCHAR(30),
@@ -117,9 +131,9 @@ CREATE TABLE IF NOT EXISTS public.manufacturers (
 );
 
 -- 7. Brands (Marcas)
-CREATE TABLE IF NOT EXISTS public.brands (
+CREATE TABLE IF NOT EXISTS marketflow.brands (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(100) NOT NULL,
   description TEXT,
   logo_url TEXT,
@@ -130,9 +144,9 @@ CREATE TABLE IF NOT EXISTS public.brands (
 );
 
 -- 8. Suppliers (Fornecedores)
-CREATE TABLE IF NOT EXISTS public.suppliers (
+CREATE TABLE IF NOT EXISTS marketflow.suppliers (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(150) NOT NULL,
   legal_name VARCHAR(200),
   cnpj VARCHAR(30),
@@ -148,13 +162,13 @@ CREATE TABLE IF NOT EXISTS public.suppliers (
 );
 
 -- 9. Products (Produtos com Data de Validade & Vínculos Cesta)
-CREATE TABLE IF NOT EXISTS public.products (
+CREATE TABLE IF NOT EXISTS marketflow.products (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  category_id TEXT REFERENCES public.categories(id) ON DELETE SET NULL,
-  brand_id TEXT REFERENCES public.brands(id) ON DELETE SET NULL,
-  supplier_id TEXT REFERENCES public.suppliers(id) ON DELETE SET NULL,
-  manufacturer_id TEXT REFERENCES public.manufacturers(id) ON DELETE SET NULL,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  category_id TEXT REFERENCES marketflow.categories(id) ON DELETE SET NULL,
+  brand_id TEXT REFERENCES marketflow.brands(id) ON DELETE SET NULL,
+  supplier_id TEXT REFERENCES marketflow.suppliers(id) ON DELETE SET NULL,
+  manufacturer_id TEXT REFERENCES marketflow.manufacturers(id) ON DELETE SET NULL,
   name VARCHAR(200) NOT NULL,
   description TEXT,
   sku VARCHAR(50),
@@ -179,23 +193,23 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- 10. Inventory Items (Estoque Consolidado)
-CREATE TABLE IF NOT EXISTS public.inventory_items (
+CREATE TABLE IF NOT EXISTS marketflow.inventory_items (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
   quantity INTEGER NOT NULL DEFAULT 0,
   reserved_quantity INTEGER NOT NULL DEFAULT 0,
   location VARCHAR(100),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT unique_product_inventory UNIQUE (company_id, product_id)
+  CONSTRAINT unique_product_inventory_mf UNIQUE (company_id, product_id)
 );
 
 -- 11. Lots (Lotes com Data de Validade)
-CREATE TABLE IF NOT EXISTS public.lots (
+CREATE TABLE IF NOT EXISTS marketflow.lots (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
   lot_number VARCHAR(100) NOT NULL,
   initial_quantity INTEGER NOT NULL DEFAULT 0,
   current_quantity INTEGER NOT NULL DEFAULT 0,
@@ -208,25 +222,25 @@ CREATE TABLE IF NOT EXISTS public.lots (
 );
 
 -- 12. Inventory Movements (Kardex / Movimentações de Estoque)
-CREATE TABLE IF NOT EXISTS public.inventory_movements (
+CREATE TABLE IF NOT EXISTS marketflow.inventory_movements (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  lot_id TEXT REFERENCES public.lots(id) ON DELETE SET NULL,
-  type VARCHAR(30) NOT NULL, -- 'in', 'out', 'transfer', 'adjustment', 'loss'
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
+  lot_id TEXT REFERENCES marketflow.lots(id) ON DELETE SET NULL,
+  type VARCHAR(30) NOT NULL,
   quantity INTEGER NOT NULL,
   previous_quantity INTEGER NOT NULL DEFAULT 0,
   new_quantity INTEGER NOT NULL DEFAULT 0,
   reason TEXT,
   document_reference VARCHAR(100),
-  performed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  performed_by UUID REFERENCES marketflow.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- 13. Catalog Requests (Pedidos e Contatos da Loja Pública)
-CREATE TABLE IF NOT EXISTS public.catalog_requests (
+CREATE TABLE IF NOT EXISTS marketflow.catalog_requests (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   customer_name VARCHAR(150) NOT NULL,
   customer_phone VARCHAR(30) NOT NULL,
   customer_email VARCHAR(255),
@@ -235,212 +249,195 @@ CREATE TABLE IF NOT EXISTS public.catalog_requests (
   delivery_address TEXT,
   gift_message TEXT,
   status VARCHAR(30) NOT NULL DEFAULT 'pending',
-  source VARCHAR(50) DEFAULT 'whatsapp_catalog',
+  notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ====================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) POLICIES NO SCHEMA MARKETFLOW
 -- ====================================================================
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.company_users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.manufacturers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.inventory_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.lots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.catalog_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.company_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.manufacturers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.brands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.suppliers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.inventory_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.lots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.inventory_movements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.catalog_requests ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Public read, user can update own profile
-CREATE POLICY "Profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+-- Políticas de Leitura Pública e Modificação Autenticada
+DO $$ BEGIN
+  CREATE POLICY "Profiles are viewable by everyone" ON marketflow.profiles FOR SELECT USING (true);
+  CREATE POLICY "Users can update their own profile" ON marketflow.profiles FOR ALL USING (auth.uid() = id);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Companies: Public read for active companies (public store), full access for members
-CREATE POLICY "Active companies viewable publicly" ON public.companies FOR SELECT USING (active = true);
-CREATE POLICY "Company members full access to company" ON public.companies FOR ALL TO authenticated USING (
-  id IN (SELECT company_id FROM public.company_users WHERE user_id = auth.uid()) OR
-  created_by = auth.uid()
-);
+DO $$ BEGIN
+  CREATE POLICY "Companies viewable by everyone" ON marketflow.companies FOR SELECT USING (true);
+  CREATE POLICY "Companies manageable by authenticated" ON marketflow.companies FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Company Users: Authenticated members can view users
-CREATE POLICY "Members can view company users" ON public.company_users FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Admins can manage company users" ON public.company_users FOR ALL TO authenticated USING (
-  company_id IN (
-    SELECT company_id FROM public.company_users WHERE user_id = auth.uid() AND role IN ('global_admin', 'admin')
-  )
-);
+DO $$ BEGIN
+  CREATE POLICY "Categories viewable by everyone" ON marketflow.categories FOR SELECT USING (true);
+  CREATE POLICY "Categories manageable by authenticated" ON marketflow.categories FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Generic macro-like policies for tenant tables (public read for store, authenticated edit)
-CREATE POLICY "Public read categories" ON public.categories FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage categories" ON public.categories FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Brands viewable by everyone" ON marketflow.brands FOR SELECT USING (true);
+  CREATE POLICY "Brands manageable by authenticated" ON marketflow.brands FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read brands" ON public.brands FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage brands" ON public.brands FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Products viewable by everyone" ON marketflow.products FOR SELECT USING (true);
+  CREATE POLICY "Products manageable by authenticated" ON marketflow.products FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Authenticated manage manufacturers" ON public.manufacturers FOR ALL TO authenticated USING (true);
-CREATE POLICY "Authenticated manage suppliers" ON public.suppliers FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Inventory viewable by everyone" ON marketflow.inventory_items FOR SELECT USING (true);
+  CREATE POLICY "Inventory manageable by authenticated" ON marketflow.inventory_items FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read products" ON public.products FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage products" ON public.products FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Lots viewable by everyone" ON marketflow.lots FOR SELECT USING (true);
+  CREATE POLICY "Lots manageable by authenticated" ON marketflow.lots FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read inventory" ON public.inventory_items FOR SELECT USING (true);
-CREATE POLICY "Authenticated manage inventory" ON public.inventory_items FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Movements viewable by everyone" ON marketflow.inventory_movements FOR SELECT USING (true);
+  CREATE POLICY "Movements manageable by authenticated" ON marketflow.inventory_movements FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read lots" ON public.lots FOR SELECT USING (true);
-CREATE POLICY "Authenticated manage lots" ON public.lots FOR ALL TO authenticated USING (true);
-
-CREATE POLICY "Authenticated manage movements" ON public.inventory_movements FOR ALL TO authenticated USING (true);
-
-CREATE POLICY "Public insert catalog requests" ON public.catalog_requests FOR INSERT WITH CHECK (true);
-CREATE POLICY "Company members view catalog requests" ON public.catalog_requests FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Requests insertable by everyone" ON marketflow.catalog_requests FOR INSERT WITH CHECK (true);
+  CREATE POLICY "Requests viewable by authenticated" ON marketflow.catalog_requests FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- ====================================================================
--- SEED DATA
+-- SEED DATA NO SCHEMA MARKETFLOW
 -- ====================================================================
 
--- 1. Empresas
-INSERT INTO public.companies (
-  id, name, legal_name, cnpj, slug, phone, whatsapp, description, subtitulo, moeda, avisoRodape, breakfast_basket_enabled, active
-) VALUES
-(
+-- 1. Empresa Principal
+INSERT INTO marketflow.companies (
+  id, name, legal_name, cnpj, slug, phone, whatsapp, description,
+  subtitulo, moeda, avisoRodape, breakfast_basket_enabled, active
+) VALUES (
   'comp-cesta-1',
   'Cestas de Café da Manhã',
-  'Olivelas MarketFlow Comércio Ltda',
-  '12.345.678/0001-90',
+  'Cestas & Cia Café da Manhã Ltda',
+  '42.109.876/0001-55',
   'cestas-cafe-da-manha',
   '(11) 96382-0374',
   '5511963820374',
-  'Especialista em cestas de café da manhã e presentes para datas especiais.',
+  'Monte a sua cesta e envie o pedido pelo WhatsApp.',
   'Monte a sua cesta e envie o pedido pelo WhatsApp',
   'BRL',
   'Cardápio de exemplo — em ajustes.',
   true,
-  true
-),
-(
-  'comp-2',
-  'Adega & Conveniência Gourmet',
-  'Adega Gourmet Eireli',
-  '98.765.432/0001-10',
-  'adega-gourmet',
-  '(11) 91234-5678',
-  '5511912345678',
-  'Bebidas geladas, aperitivos e conveniência.',
-  'Bebidas e produtos selecionados',
-  'BRL',
-  'Entregas rápidas na região.',
-  false,
   true
 )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   legal_name = EXCLUDED.legal_name,
   cnpj = EXCLUDED.cnpj,
+  slug = EXCLUDED.slug,
   whatsapp = EXCLUDED.whatsapp,
-  breakfast_basket_enabled = EXCLUDED.breakfast_basket_enabled;
+  description = EXCLUDED.description;
 
--- Vínculo automático de todos os usuários cadastrados como Admin da empresa principal
-INSERT INTO public.company_users (company_id, user_id, role, active)
-SELECT 'comp-cesta-1', id, 'admin'::public.app_role, true
-FROM auth.users
-ON CONFLICT (company_id, user_id) DO NOTHING;
-
--- 2. Categorias
-INSERT INTO public.categories (id, company_id, name, description, active) VALUES
-('cat-bebidas', 'comp-cesta-1', 'Bebidas', 'Sucos, chás, iogurtes, achocolatados e refrigerantes.', true),
-('cat-paes-bolos', 'comp-cesta-1', 'Pães & Bolos', 'Pães artesanais, torradas, croissants e bolos.', true),
-('cat-biscoitos', 'comp-cesta-1', 'Biscoitos & Bolachas', 'Wafers, cookies e biscoitos doces e salgados.', true),
-('cat-frios-queijos', 'comp-cesta-1', 'Frios & Queijos', 'Queijos selecionados, presunto e requeijão.', true),
-('cat-frutas', 'comp-cesta-1', 'Frutas Selecionadas', 'Frutas frescas e higienizadas da estação.', true),
-('cat-doces-geleias', 'comp-cesta-1', 'Doces & Geleias', 'Nutella, geleias artesanais e mel.', true),
-('cat-chocolates', 'comp-cesta-1', 'Chocolates & Bombons', 'Milka, Ferrero Rocher, Lindt e bombons.', true),
-('cat-mercearia-cafe', 'comp-cesta-1', 'Café & Mercearia', 'Cafés solúveis, sachês, cappuccinos, manteigas e açúcares.', true),
-('cat-adicionais', 'comp-cesta-1', 'Adicionais & Presentes', 'Itens comemorativos, canecas, cartões, balões e flores.', true),
-('cat-canecas-brindes', 'comp-cesta-1', 'Canecas & Brindes', 'Itens comemorativos, canecas e cartões de presente.', true)
+-- 2. Categorias Oficiais
+INSERT INTO marketflow.categories (id, company_id, name, description, active) VALUES
+('cat-mercearia-cafe', 'comp-cesta-1', 'Cafés & Matinais', 'Cafés especiais, chás e matinais', true),
+('cat-bebidas', 'comp-cesta-1', 'Bebidas', 'Sucos, achocolatados, cafés prontos, chás e espumantes', true),
+('cat-padaria', 'comp-cesta-1', 'Padaria & Confeitaria', 'Pães especiais, torradas, croissants, bolos e waffles', true),
+('cat-frios', 'comp-cesta-1', 'Frios & Laticínios', 'Queijos selecionados, iogurtes, manteigas e requeijão', true),
+('cat-biscoitos', 'comp-cesta-1', 'Biscoitos & Snacks', 'Cookies artesanais, biscoitos finos, crackers e nuts', true),
+('cat-frutas', 'comp-cesta-1', 'Frutas Frescas', 'Frutas higienizadas e selecionadas para consumo imediato', true),
+('cat-geleias', 'comp-cesta-1', 'Geleias & Doces', 'Geleias artesanais, mel puro, cremes e chocolates', true),
+('cat-flores', 'comp-cesta-1', 'Flores & Afeto', 'Arranjos florais compactos e botões de rosas naturais', true),
+('cat-canecas', 'comp-cesta-1', 'Canecas & Lembranças', 'Canecas de cerâmica, xícaras especiais e cartões comemorativos', true),
+('cat-embalagens', 'comp-cesta-1', 'Cestas & Embalagens', 'Cestas de vime rústico, caixas cartonadas premium e laços', true),
+('cat-adicionais', 'comp-cesta-1', 'Adicionais & Acessórios', 'Itens complementares e brindes decorativos', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 
--- 3. Fornecedores
-INSERT INTO public.suppliers (id, company_id, name, legal_name, cnpj, phone, whatsapp, active) VALUES
-('sup-1', 'comp-cesta-1', 'Distribuidora Panificação & Doces SP', 'SP Panificação & Alimentos Ltda', '11.222.333/0001-44', '(11) 3333-4444', '5511963820374', true),
-('sup-2', 'comp-cesta-1', 'Atacado Hortifruti & Laticínios Central', 'Horti Laticínios Atacadista S.A.', '55.666.777/0001-88', '(11) 2222-1111', '5511963820374', true)
+-- 3. Marcas Oficiais (39 marcas)
+INSERT INTO marketflow.brands (id, company_id, name, description, active) VALUES
+('brand-1', 'comp-cesta-1', 'Del Valle', NULL, true),
+('brand-2', 'comp-cesta-1', 'Toddynho', NULL, true),
+('brand-3', 'comp-cesta-1', 'Kero Coco', NULL, true),
+('brand-4', 'comp-cesta-1', 'Danone', NULL, true),
+('brand-5', 'comp-cesta-1', 'Ades', NULL, true),
+('brand-6', 'comp-cesta-1', 'Natural One', NULL, true),
+('brand-7', 'comp-cesta-1', 'Antarctica', NULL, true),
+('brand-8', 'comp-cesta-1', 'Leão', NULL, true),
+('brand-9', 'comp-cesta-1', 'Aurora', NULL, true),
+('brand-10', 'comp-cesta-1', 'Maguary', NULL, true),
+('brand-11', 'comp-cesta-1', 'Pullman', NULL, true),
+('brand-12', 'comp-cesta-1', 'Wickbold', NULL, true),
+('brand-13', 'comp-cesta-1', 'Ana Maria', NULL, true),
+('brand-14', 'comp-cesta-1', 'Forno de Minas', NULL, true),
+('brand-15', 'comp-cesta-1', 'Padaria', NULL, true),
+('brand-16', 'comp-cesta-1', 'Trakinas', NULL, true),
+('brand-17', 'comp-cesta-1', 'Negresco', NULL, true),
+('brand-18', 'comp-cesta-1', 'Bono', NULL, true),
+('brand-19', 'comp-cesta-1', 'Passatempo', NULL, true),
+('brand-20', 'comp-cesta-1', 'Club Social', NULL, true),
+('brand-21', 'comp-cesta-1', 'Adria', NULL, true),
+('brand-22', 'comp-cesta-1', 'Bauducco', NULL, true),
+('brand-23', 'comp-cesta-1', 'Sadia', NULL, true),
+('brand-24', 'comp-cesta-1', 'Seara', NULL, true),
+('brand-25', 'comp-cesta-1', 'Tirolez', NULL, true),
+('brand-26', 'comp-cesta-1', 'Catupiry', NULL, true),
+('brand-27', 'comp-cesta-1', 'Queensberry', NULL, true),
+('brand-28', 'comp-cesta-1', 'Nutella', NULL, true),
+('brand-29', 'comp-cesta-1', 'Aviação', NULL, true),
+('brand-30', 'comp-cesta-1', 'Karo', NULL, true),
+('brand-31', 'comp-cesta-1', 'Yoki', NULL, true),
+('brand-32', 'comp-cesta-1', 'Hortifruti', NULL, true),
+('brand-33', 'comp-cesta-1', 'Pilão', NULL, true),
+('brand-34', 'comp-cesta-1', '3 Corações', NULL, true),
+('brand-35', 'comp-cesta-1', 'Twinings', NULL, true),
+('brand-36', 'comp-cesta-1', 'União', NULL, true),
+('brand-37', 'comp-cesta-1', 'Salton', NULL, true),
+('brand-38', 'comp-cesta-1', 'Pérgola', NULL, true),
+('brand-39', 'comp-cesta-1', 'Lindt', NULL, true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 4. Fabricantes
-INSERT INTO public.manufacturers (id, company_id, name, document, phone, active) VALUES
-('mfg-1', 'comp-cesta-1', 'Ambev S.A.', '07.526.557/0001-00', '(11) 2122-1000', true),
-('mfg-2', 'comp-cesta-1', 'Coca-Cola FEMSA Brasil', '45.997.418/0001-53', '0800 021 2121', true),
-('mfg-3', 'comp-cesta-1', 'Vinícola Aurora Bento Gonçalves', '87.548.724/0001-30', '(54) 3455-2000', true)
+-- 4. Fabricantes Oficiais
+INSERT INTO marketflow.manufacturers (id, company_id, name, document, phone, email, active) VALUES
+('mfg-1', 'comp-cesta-1', 'Ambev S.A.', '07.526.557/0001-00', '(11) 2122-1000', 'contato@ambev.com.br', true),
+('mfg-2', 'comp-cesta-1', 'Coca-Cola FEMSA Brasil', '45.997.418/0001-53', '0800 021 2121', 'sac@cocacola.com.br', true),
+('mfg-3', 'comp-cesta-1', 'Vinícola Aurora Bento Gonçalves', '87.548.724/0001-30', '(54) 3455-2000', 'comercial@vinicolaaurora.com.br', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 5. Marcas
-INSERT INTO public.brands (id, company_id, name, active) VALUES
-('brand-1', 'comp-cesta-1', 'Del Valle', true),
-('brand-2', 'comp-cesta-1', 'Toddynho', true),
-('brand-3', 'comp-cesta-1', 'Kero Coco', true),
-('brand-4', 'comp-cesta-1', 'Danone', true),
-('brand-5', 'comp-cesta-1', 'Ades', true),
-('brand-6', 'comp-cesta-1', 'Natural One', true),
-('brand-7', 'comp-cesta-1', 'Antarctica', true),
-('brand-8', 'comp-cesta-1', 'Leão', true),
-('brand-9', 'comp-cesta-1', 'Aurora', true),
-('brand-10', 'comp-cesta-1', 'Maguary', true),
-('brand-11', 'comp-cesta-1', 'Pullman', true),
-('brand-12', 'comp-cesta-1', 'Wickbold', true),
-('brand-13', 'comp-cesta-1', 'Ana Maria', true),
-('brand-14', 'comp-cesta-1', 'Forno de Minas', true),
-('brand-15', 'comp-cesta-1', 'Padaria', true),
-('brand-16', 'comp-cesta-1', 'Trakinas', true),
-('brand-17', 'comp-cesta-1', 'Negresco', true),
-('brand-18', 'comp-cesta-1', 'Bono', true),
-('brand-19', 'comp-cesta-1', 'Passatempo', true),
-('brand-20', 'comp-cesta-1', 'Club Social', true),
-('brand-21', 'comp-cesta-1', 'Adria', true),
-('brand-22', 'comp-cesta-1', 'Bauducco', true),
-('brand-23', 'comp-cesta-1', 'Sadia', true),
-('brand-24', 'comp-cesta-1', 'Seara', true),
-('brand-25', 'comp-cesta-1', 'Tirolez', true),
-('brand-26', 'comp-cesta-1', 'Catupiry', true),
-('brand-27', 'comp-cesta-1', 'Queensberry', true),
-('brand-28', 'comp-cesta-1', 'Nutella', true),
-('brand-29', 'comp-cesta-1', 'Aviação', true),
-('brand-30', 'comp-cesta-1', 'Karo', true),
-('brand-31', 'comp-cesta-1', 'Yoki', true),
-('brand-32', 'comp-cesta-1', 'Hortifruti', true),
-('brand-33', 'comp-cesta-1', 'Pilão', true),
-('brand-34', 'comp-cesta-1', '3 Corações', true),
-('brand-35', 'comp-cesta-1', 'Twinings', true),
-('brand-36', 'comp-cesta-1', 'União', true),
-('brand-37', 'comp-cesta-1', 'Salton', true),
-('brand-38', 'comp-cesta-1', 'Pérgola', true),
-('brand-39', 'comp-cesta-1', 'Lindt', true)
+-- 5. Fornecedores Oficiais
+INSERT INTO marketflow.suppliers (id, company_id, name, legal_name, cnpj, phone, whatsapp, active) VALUES
+('sup-1', 'comp-cesta-1', 'Distribuidora Matinais Brasil', 'Distribuidora Matinais Brasil Ltda', '11.222.333/0001-44', '(11) 3344-5566', '5511933445566', true),
+('sup-2', 'comp-cesta-1', 'Empório Central de Alimentos', 'Empório Central Alimentos Eireli', '22.333.444/0001-55', '(11) 4455-6677', '5511944556677', true),
+('sup-3', 'comp-cesta-1', 'Hortifruti & Flores Selecionadas', 'Hortifruti e Flores Ltda', '33.444.555/0001-66', '(11) 5566-7788', '5511955667788', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 6. Produtos (Todos os 51 Itens Oficiais com Validade Real)
-INSERT INTO public.products (
-  id, company_id, category_id, brand_id, name, description, sku, barcode, unit,
-  cost_price, sale_price, minimum_stock, maximum_stock, expiration_date,
-  active, catalog_visible, show_price, allow_contact, active_in_basket, basket_sizes, drink_tier
+-- 6. Produtos Oficiais (51 itens com shelf-life real)
+INSERT INTO marketflow.products (
+  id, company_id, category_id, brand_id, name, description,
+  cost_price, sale_price, minimum_stock, maximum_stock,
+  expiration_date, active, catalog_visible, show_price, allow_contact,
+  active_in_basket, basket_sizes, drink_tier
 ) VALUES
 (
   'beb-suco-delvalle-200',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-1',
+  NULL,
   'Suco Del Valle Uva 200 ml',
   'Suco Del Valle Uva 200 ml (Del Valle). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-SUCO-DELVALLE-200',
-  '7897957234103',
-  'UN',
   2.69,
   4.49,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -453,17 +450,14 @@ INSERT INTO public.products (
   'beb-toddynho-200',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-2',
+  NULL,
   'Achocolatado Toddynho 200 ml',
   'Achocolatado Toddynho 200 ml (Toddynho). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-TODDYNHO-200',
-  '7893231774002',
-  'UN',
   1.97,
   3.29,
   5,
   50,
-  '2026-11-20',
+  '2026-12-30',
   true,
   true,
   true,
@@ -476,17 +470,14 @@ INSERT INTO public.products (
   'beb-agua-coco-200',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-3',
+  NULL,
   'Água de Coco Kero Coco 200 ml',
   'Água de Coco Kero Coco 200 ml (Kero Coco). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-AGUA-COCO-200',
-  '7892908327126',
-  'UN',
   2.99,
   4.99,
   5,
   50,
-  '2026-12-05',
+  '2027-01-14',
   true,
   true,
   true,
@@ -499,17 +490,14 @@ INSERT INTO public.products (
   'beb-iog-danone-170',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-4',
+  NULL,
   'Iogurte Líquido Danone 170 g',
   'Iogurte Líquido Danone 170 g (Danone). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-IOG-DANONE-170',
-  '7893753568948',
-  'UN',
   2.27,
   3.79,
   5,
   50,
-  '2026-09-13',
+  '2026-10-23',
   true,
   true,
   true,
@@ -522,17 +510,14 @@ INSERT INTO public.products (
   'beb-ades-500',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-5',
+  NULL,
   'Bebida de Soja Ades Maçã 500 ml',
   'Bebida de Soja Ades Maçã 500 ml (Ades). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-ADES-500',
-  '7893409928575',
-  'UN',
   3.89,
   6.49,
   5,
   50,
-  '2026-10-21',
+  '2026-11-30',
   true,
   true,
   true,
@@ -545,17 +530,14 @@ INSERT INTO public.products (
   'beb-suco-natone-500',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-6',
+  NULL,
   'Suco Natural One Laranja 500 ml',
   'Suco Natural One Laranja 500 ml (Natural One). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-SUCO-NATONE-500',
-  '7897086926449',
-  'UN',
   6.54,
   10.90,
   5,
   50,
-  '2026-09-20',
+  '2026-10-30',
   true,
   true,
   true,
@@ -568,17 +550,14 @@ INSERT INTO public.products (
   'beb-guarana-350',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-7',
+  NULL,
   'Guaraná Antarctica 350 ml (lata)',
   'Guaraná Antarctica 350 ml (lata) (Antarctica). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-GUARANA-350',
-  '7897924077700',
-  'UN',
   2.99,
   4.99,
   5,
   50,
-  '2027-03-05',
+  '2027-04-14',
   true,
   true,
   true,
@@ -591,17 +570,14 @@ INSERT INTO public.products (
   'beb-cha-leao-450',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-8',
+  NULL,
   'Chá Leão Pêssego 450 ml',
   'Chá Leão Pêssego 450 ml (Leão). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-CHA-LEAO-450',
-  '7892626148523',
-  'UN',
   4.14,
   6.90,
   5,
   50,
-  '2026-12-05',
+  '2027-01-14',
   true,
   true,
   true,
@@ -614,17 +590,14 @@ INSERT INTO public.products (
   'beb-suco-aurora-1l',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-9',
+  NULL,
   'Suco de Uva Integral Aurora 1 L',
   'Suco de Uva Integral Aurora 1 L (Aurora). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-SUCO-AURORA-1L',
-  '7896755628176',
-  'UN',
   11.34,
   18.90,
   5,
   50,
-  '2027-01-04',
+  '2027-02-13',
   true,
   true,
   true,
@@ -637,17 +610,14 @@ INSERT INTO public.products (
   'beb-maguary-1l',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-10',
+  NULL,
   'Néctar Maguary Manga 1 L',
   'Néctar Maguary Manga 1 L (Maguary). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-MAGUARY-1L',
-  '7893922152857',
-  'UN',
   5.94,
   9.90,
   5,
   50,
-  '2026-12-15',
+  '2027-01-24',
   true,
   true,
   true,
@@ -660,17 +630,14 @@ INSERT INTO public.products (
   'beb-guarana-1l',
   'comp-cesta-1',
   'cat-bebidas',
-  'brand-7',
+  NULL,
   'Guaraná Antarctica 1 L',
   'Guaraná Antarctica 1 L (Antarctica). Ideal para montagem de cestas matinais personalizadas.',
-  'BEB-GUARANA-1L',
-  '7899988353911',
-  'UN',
   5.09,
   8.49,
   5,
   50,
-  '2027-03-05',
+  '2027-04-14',
   true,
   true,
   true,
@@ -683,17 +650,14 @@ INSERT INTO public.products (
   'pb-pao-forma-pullman',
   'comp-cesta-1',
   'cat-paes-bolos',
-  'brand-11',
+  NULL,
   'Pão de Forma Pullman 100% Integral',
   'Pão de Forma Pullman 100% Integral (Pullman). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-PAO-FORMA-PULLMAN',
-  '7897529762833',
-  'UN',
   5.94,
   9.90,
   5,
   50,
-  '2026-09-20',
+  '2026-10-30',
   true,
   true,
   true,
@@ -706,17 +670,14 @@ INSERT INTO public.products (
   'pb-bisnaguinha-wickbold',
   'comp-cesta-1',
   'cat-paes-bolos',
-  'brand-12',
+  NULL,
   'Bisnaguinha Wickbold',
   'Bisnaguinha Wickbold (Wickbold). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-BISNAGUINHA-WICKBOLD',
-  '7892983482294',
-  'UN',
   4.49,
   7.49,
   5,
   50,
-  '2026-09-24',
+  '2026-11-03',
   true,
   true,
   true,
@@ -729,17 +690,14 @@ INSERT INTO public.products (
   'pb-bolo-anamaria',
   'comp-cesta-1',
   'cat-paes-bolos',
-  'brand-13',
+  NULL,
   'Bolinho Ana Maria (unid.)',
   'Bolinho Ana Maria (unid.) (Ana Maria). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-BOLO-ANAMARIA',
-  '7896541425704',
-  'UN',
   2.09,
   3.49,
   5,
   50,
-  '2026-10-06',
+  '2026-11-15',
   true,
   true,
   true,
@@ -752,17 +710,14 @@ INSERT INTO public.products (
   'pb-pao-queijo-fdm',
   'comp-cesta-1',
   'cat-paes-bolos',
-  'brand-14',
+  NULL,
   'Pão de Queijo Forno de Minas 400 g',
   'Pão de Queijo Forno de Minas 400 g (Forno de Minas). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-PAO-QUEIJO-FDM',
-  '7896616785174',
-  'UN',
   10.14,
   16.90,
   5,
   50,
-  '2026-12-05',
+  '2027-01-14',
   true,
   true,
   true,
@@ -778,14 +733,11 @@ INSERT INTO public.products (
   NULL,
   'Croissant Folhado (unid.)',
   'Croissant Folhado (unid.) (Padaria). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-CROISSANT',
-  '7896666662901',
-  'UN',
   3.30,
   5.50,
   5,
   50,
-  '2026-09-09',
+  '2026-10-19',
   true,
   true,
   true,
@@ -801,14 +753,11 @@ INSERT INTO public.products (
   NULL,
   'Rosca de Coco (unid.)',
   'Rosca de Coco (unid.) (Padaria). Ideal para montagem de cestas matinais personalizadas.',
-  'PB-ROSCA-COCO',
-  '7897991297927',
-  'UN',
   7.74,
   12.90,
   5,
   50,
-  '2026-09-11',
+  '2026-10-21',
   true,
   true,
   true,
@@ -821,17 +770,14 @@ INSERT INTO public.products (
   'bis-trakinas-morango',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-16',
+  NULL,
   'Biscoito Recheado Trakinas Morango',
   'Biscoito Recheado Trakinas Morango (Trakinas). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-TRAKINAS-MORANGO',
-  '7899235059259',
-  'UN',
   1.91,
   3.19,
   5,
   50,
-  '2027-02-03',
+  '2027-03-15',
   true,
   true,
   true,
@@ -844,17 +790,14 @@ INSERT INTO public.products (
   'bis-negresco',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-17',
+  NULL,
   'Biscoito Recheado Negresco',
   'Biscoito Recheado Negresco (Negresco). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-NEGRESCO',
-  '7893905826382',
-  'UN',
   2.09,
   3.49,
   5,
   50,
-  '2027-02-03',
+  '2027-03-15',
   true,
   true,
   true,
@@ -867,17 +810,14 @@ INSERT INTO public.products (
   'bis-bono-choc',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-18',
+  NULL,
   'Biscoito Bono Chocolate',
   'Biscoito Bono Chocolate (Bono). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-BONO-CHOC',
-  '7898960948013',
-  'UN',
   1.97,
   3.29,
   5,
   50,
-  '2027-02-03',
+  '2027-03-15',
   true,
   true,
   true,
@@ -890,17 +830,14 @@ INSERT INTO public.products (
   'bis-passatempo',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-19',
+  NULL,
   'Biscoito Recheado Passatempo',
   'Biscoito Recheado Passatempo (Passatempo). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-PASSATEMPO',
-  '7899028590079',
-  'UN',
   2.03,
   3.39,
   5,
   50,
-  '2027-02-03',
+  '2027-03-15',
   true,
   true,
   true,
@@ -913,17 +850,14 @@ INSERT INTO public.products (
   'bis-club-social',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-20',
+  NULL,
   'Biscoito Club Social Original (6x)',
   'Biscoito Club Social Original (6x) (Club Social). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-CLUB-SOCIAL',
-  '7895813558342',
-  'UN',
   3.29,
   5.49,
   5,
   50,
-  '2026-12-05',
+  '2027-01-14',
   true,
   true,
   true,
@@ -936,17 +870,14 @@ INSERT INTO public.products (
   'bis-cream-cracker-adria',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-21',
+  NULL,
   'Cream Cracker Adria',
   'Cream Cracker Adria (Adria). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-CREAM-CRACKER-ADRIA',
-  '7894970636128',
-  'UN',
   2.57,
   4.29,
   5,
   50,
-  '2027-01-04',
+  '2027-02-13',
   true,
   true,
   true,
@@ -959,17 +890,14 @@ INSERT INTO public.products (
   'bis-waffer-bauducco',
   'comp-cesta-1',
   'cat-biscoitos',
-  'brand-22',
+  NULL,
   'Wafer Bauducco Chocolate',
   'Wafer Bauducco Chocolate (Bauducco). Ideal para montagem de cestas matinais personalizadas.',
-  'BIS-WAFFER-BAUDUCCO',
-  '7897080308554',
-  'UN',
   2.27,
   3.79,
   5,
   50,
-  '2027-02-03',
+  '2027-03-15',
   true,
   true,
   true,
@@ -982,17 +910,14 @@ INSERT INTO public.products (
   'fq-queijo-prato-sadia',
   'comp-cesta-1',
   'cat-frios-queijos',
-  'brand-23',
+  NULL,
   'Queijo Prato Fatiado Sadia 150 g',
   'Queijo Prato Fatiado Sadia 150 g (Sadia). Ideal para montagem de cestas matinais personalizadas.',
-  'FQ-QUEIJO-PRATO-SADIA',
-  '7896283019734',
-  'UN',
   7.74,
   12.90,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1005,17 +930,14 @@ INSERT INTO public.products (
   'fq-presunto-seara',
   'comp-cesta-1',
   'cat-frios-queijos',
-  'brand-24',
+  NULL,
   'Presunto Cozido Fatiado Seara 150 g',
   'Presunto Cozido Fatiado Seara 150 g (Seara). Ideal para montagem de cestas matinais personalizadas.',
-  'FQ-PRESUNTO-SEARA',
-  '7894103372034',
-  'UN',
   5.94,
   9.90,
   5,
   50,
-  '2026-09-11',
+  '2026-10-21',
   true,
   true,
   true,
@@ -1028,17 +950,14 @@ INSERT INTO public.products (
   'fq-mussarela-tirolez',
   'comp-cesta-1',
   'cat-frios-queijos',
-  'brand-25',
+  NULL,
   'Mussarela Fatiada Tirolez 150 g',
   'Mussarela Fatiada Tirolez 150 g (Tirolez). Ideal para montagem de cestas matinais personalizadas.',
-  'FQ-MUSSARELA-TIROLEZ',
-  '7894418573756',
-  'UN',
   8.10,
   13.50,
   5,
   50,
-  '2026-09-21',
+  '2026-10-31',
   true,
   true,
   true,
@@ -1051,17 +970,14 @@ INSERT INTO public.products (
   'fq-requeijao-catupiry',
   'comp-cesta-1',
   'cat-frios-queijos',
-  'brand-26',
+  NULL,
   'Requeijão Catupiry 200 g',
   'Requeijão Catupiry 200 g (Catupiry). Ideal para montagem de cestas matinais personalizadas.',
-  'FQ-REQUEIJAO-CATUPIRY',
-  '7891667473260',
-  'UN',
   7.14,
   11.90,
   5,
   50,
-  '2026-10-16',
+  '2026-11-25',
   true,
   true,
   true,
@@ -1074,17 +990,14 @@ INSERT INTO public.products (
   'dg-geleia-queensberry',
   'comp-cesta-1',
   'cat-doces-geleias',
-  'brand-27',
+  NULL,
   'Geleia Queensberry Morango 320 g',
   'Geleia Queensberry Morango 320 g (Queensberry). Ideal para montagem de cestas matinais personalizadas.',
-  'DG-GELEIA-QUEENSBERRY',
-  '7893820735605',
-  'UN',
   9.54,
   15.90,
   5,
   50,
-  '2027-07-03',
+  '2027-08-12',
   true,
   true,
   true,
@@ -1097,17 +1010,14 @@ INSERT INTO public.products (
   'dg-nutella-140',
   'comp-cesta-1',
   'cat-doces-geleias',
-  'brand-28',
+  NULL,
   'Creme de Avelã Nutella 140 g',
   'Creme de Avelã Nutella 140 g (Nutella). Ideal para montagem de cestas matinais personalizadas.',
-  'DG-NUTELLA-140',
-  '7894997078515',
-  'UN',
   8.34,
   13.90,
   5,
   50,
-  '2027-07-03',
+  '2027-08-12',
   true,
   true,
   true,
@@ -1120,17 +1030,14 @@ INSERT INTO public.products (
   'dg-doce-leite-aviacao',
   'comp-cesta-1',
   'cat-doces-geleias',
-  'brand-29',
+  NULL,
   'Doce de Leite Aviação 400 g',
   'Doce de Leite Aviação 400 g (Aviação). Ideal para montagem de cestas matinais personalizadas.',
-  'DG-DOCE-LEITE-AVIACAO',
-  '7898986407976',
-  'UN',
   7.50,
   12.50,
   5,
   50,
-  '2027-07-03',
+  '2027-08-12',
   true,
   true,
   true,
@@ -1143,17 +1050,14 @@ INSERT INTO public.products (
   'dg-mel-karo',
   'comp-cesta-1',
   'cat-doces-geleias',
-  'brand-30',
+  NULL,
   'Mel Karo Squeeze 200 g',
   'Mel Karo Squeeze 200 g (Karo). Ideal para montagem de cestas matinais personalizadas.',
-  'DG-MEL-KARO',
-  '7898634541351',
-  'UN',
   8.94,
   14.90,
   5,
   50,
-  '2027-07-03',
+  '2027-08-12',
   true,
   true,
   true,
@@ -1166,17 +1070,14 @@ INSERT INTO public.products (
   'dg-pacoca-yoki',
   'comp-cesta-1',
   'cat-doces-geleias',
-  'brand-31',
+  NULL,
   'Paçoca Rolha Yoki (unid.)',
   'Paçoca Rolha Yoki (unid.) (Yoki). Ideal para montagem de cestas matinais personalizadas.',
-  'DG-PACOCA-YOKI',
-  '7897212311014',
-  'UN',
   0.77,
   1.29,
   5,
   50,
-  '2027-07-03',
+  '2027-08-12',
   true,
   true,
   true,
@@ -1192,14 +1093,11 @@ INSERT INTO public.products (
   NULL,
   'Maçã Gala (unid.)',
   'Maçã Gala (unid.) (Hortifruti). Ideal para montagem de cestas matinais personalizadas.',
-  'FR-MACA',
-  '7899350460725',
-  'UN',
   1.19,
   1.99,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1215,14 +1113,11 @@ INSERT INTO public.products (
   NULL,
   'Banana Prata (unid.)',
   'Banana Prata (unid.) (Hortifruti). Ideal para montagem de cestas matinais personalizadas.',
-  'FR-BANANA',
-  '7895023876984',
-  'UN',
   0.77,
   1.29,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1238,14 +1133,11 @@ INSERT INTO public.products (
   NULL,
   'Uva Verde sem Semente (150 g)',
   'Uva Verde sem Semente (150 g) (Hortifruti). Ideal para montagem de cestas matinais personalizadas.',
-  'FR-UVA-VERDE',
-  '7893655068095',
-  'UN',
   4.14,
   6.90,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1261,14 +1153,11 @@ INSERT INTO public.products (
   NULL,
   'Morango Bandeja 250 g',
   'Morango Bandeja 250 g (Hortifruti). Ideal para montagem de cestas matinais personalizadas.',
-  'FR-MORANGO-BANDEJA',
-  '7891829961494',
-  'UN',
   5.94,
   9.90,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1284,14 +1173,11 @@ INSERT INTO public.products (
   NULL,
   'Kiwi (unid.)',
   'Kiwi (unid.) (Hortifruti). Ideal para montagem de cestas matinais personalizadas.',
-  'FR-KIWI',
-  '7898386399745',
-  'UN',
   1.49,
   2.49,
   5,
   50,
-  '2026-09-18',
+  '2026-10-28',
   true,
   true,
   true,
@@ -1304,17 +1190,14 @@ INSERT INTO public.products (
   'mc-cafe-pilao-sache',
   'comp-cesta-1',
   'cat-mercearia-cafe',
-  'brand-33',
+  NULL,
   'Café Pilão em sachê (10 g)',
   'Café Pilão em sachê (10 g) (Pilão). Ideal para montagem de cestas matinais personalizadas.',
-  'MC-CAFE-PILAO-SACHE',
-  '7896985126725',
-  'UN',
   0.89,
   1.49,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1327,17 +1210,14 @@ INSERT INTO public.products (
   'mc-capuccino-3coracoes',
   'comp-cesta-1',
   'cat-mercearia-cafe',
-  'brand-34',
+  NULL,
   'Cappuccino 3 Corações Sachê',
   'Cappuccino 3 Corações Sachê (3 Corações). Ideal para montagem de cestas matinais personalizadas.',
-  'MC-CAPUCCINO-3CORACOES',
-  '7899589801780',
-  'UN',
   1.49,
   2.49,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1350,17 +1230,14 @@ INSERT INTO public.products (
   'mc-cha-twinings',
   'comp-cesta-1',
   'cat-mercearia-cafe',
-  'brand-35',
+  NULL,
   'Chá Twinings (cx. 10 saquinhos)',
   'Chá Twinings (cx. 10 saquinhos) (Twinings). Ideal para montagem de cestas matinais personalizadas.',
-  'MC-CHA-TWININGS',
-  '7894737706760',
-  'UN',
   7.14,
   11.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1373,17 +1250,14 @@ INSERT INTO public.products (
   'mc-manteiga-aviacao',
   'comp-cesta-1',
   'cat-mercearia-cafe',
-  'brand-29',
+  NULL,
   'Manteiga Aviação 200 g',
   'Manteiga Aviação 200 g (Aviação). Ideal para montagem de cestas matinais personalizadas.',
-  'MC-MANTEIGA-AVIACAO',
-  '7899158101218',
-  'UN',
   8.34,
   13.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1399,14 +1273,11 @@ INSERT INTO public.products (
   NULL,
   'Açúcar refinado em sachês (10x)',
   'Açúcar refinado em sachês (10x) (União). Ideal para montagem de cestas matinais personalizadas.',
-  'MC-ACUCAR-SACHE',
-  '7899735684906',
-  'UN',
   2.34,
   3.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1422,14 +1293,11 @@ INSERT INTO public.products (
   NULL,
   'Caneca personalizada',
   'Caneca personalizada (Sem marca). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-CANECA',
-  '7893670651223',
-  'UN',
   14.94,
   24.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1445,14 +1313,11 @@ INSERT INTO public.products (
   NULL,
   'Cartão com mensagem',
   'Cartão com mensagem (Sem marca). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-CARTAO',
-  '7891132746481',
-  'UN',
   3.00,
   5.00,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1468,14 +1333,11 @@ INSERT INTO public.products (
   NULL,
   'Balão metalizado',
   'Balão metalizado (Sem marca). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-BALAO',
-  '7894470786153',
-  'UN',
   8.94,
   14.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1491,14 +1353,11 @@ INSERT INTO public.products (
   NULL,
   'Mini buquê de flores',
   'Mini buquê de flores (Sem marca). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-MINI-BUQUE',
-  '7896631175255',
-  'UN',
   17.94,
   29.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1511,17 +1370,14 @@ INSERT INTO public.products (
   'ad-espumante',
   'comp-cesta-1',
   'cat-adicionais',
-  'brand-37',
+  NULL,
   'Mini Espumante Salton 187 ml',
   'Mini Espumante Salton 187 ml (Salton). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-ESPUMANTE',
-  '7895936250898',
-  'UN',
   13.74,
   22.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1534,17 +1390,14 @@ INSERT INTO public.products (
   'ad-vinho-pergola',
   'comp-cesta-1',
   'cat-adicionais',
-  'brand-38',
+  NULL,
   'Vinho Pérgola Tinto Suave 750 ml',
   'Vinho Pérgola Tinto Suave 750 ml (Pérgola). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-VINHO-PERGOLA',
-  '7896446577003',
-  'UN',
   17.94,
   29.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1557,17 +1410,14 @@ INSERT INTO public.products (
   'ad-chocolate-lindt',
   'comp-cesta-1',
   'cat-adicionais',
-  'brand-39',
+  NULL,
   'Chocolate Lindt Lindor 100 g',
   'Chocolate Lindt Lindor 100 g (Lindt). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-CHOCOLATE-LINDT',
-  '7897890119493',
-  'UN',
   20.94,
   34.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1583,14 +1433,11 @@ INSERT INTO public.products (
   NULL,
   'Par de taças de vidro',
   'Par de taças de vidro (Sem marca). Ideal para montagem de cestas matinais personalizadas.',
-  'AD-TACA',
-  '7893070554198',
-  'UN',
   11.94,
   19.90,
   5,
   50,
-  '2026-11-05',
+  '2026-12-15',
   true,
   true,
   true,
@@ -1609,7 +1456,7 @@ ON CONFLICT (id) DO UPDATE SET
   drink_tier = EXCLUDED.drink_tier;
 
 -- 7. Estoque Inicial (25 unidades de cada produto)
-INSERT INTO public.inventory_items (id, company_id, product_id, quantity, reserved_quantity, location) VALUES
+INSERT INTO marketflow.inventory_items (id, company_id, product_id, quantity, reserved_quantity, location) VALUES
 ('inv-beb-suco-delvalle-200', 'comp-cesta-1', 'beb-suco-delvalle-200', 25, 0, 'Prateleira A'),
 ('inv-beb-toddynho-200', 'comp-cesta-1', 'beb-toddynho-200', 25, 0, 'Prateleira A'),
 ('inv-beb-agua-coco-200', 'comp-cesta-1', 'beb-agua-coco-200', 25, 0, 'Prateleira A'),
@@ -1664,56 +1511,77 @@ INSERT INTO public.inventory_items (id, company_id, product_id, quantity, reserv
 ON CONFLICT (id) DO UPDATE SET quantity = EXCLUDED.quantity;
 
 -- 8. Lotes com Data de Validade Real
-INSERT INTO public.lots (id, company_id, product_id, lot_number, initial_quantity, current_quantity, manufacturing_date, expiration_date, cost_price, status) VALUES
-('lot-beb-suco-delvalle-200', 'comp-cesta-1', 'beb-suco-delvalle-200', 'LOT-2026-001', 25, 25, '2026-01-10', '2026-11-05', 2.69, 'active'),
-('lot-beb-toddynho-200', 'comp-cesta-1', 'beb-toddynho-200', 'LOT-2026-002', 25, 25, '2026-01-10', '2026-11-20', 1.97, 'active'),
-('lot-beb-agua-coco-200', 'comp-cesta-1', 'beb-agua-coco-200', 'LOT-2026-003', 25, 25, '2026-01-10', '2026-12-05', 2.99, 'active'),
-('lot-beb-iog-danone-170', 'comp-cesta-1', 'beb-iog-danone-170', 'LOT-2026-004', 25, 25, '2026-01-10', '2026-09-13', 2.27, 'active'),
-('lot-beb-ades-500', 'comp-cesta-1', 'beb-ades-500', 'LOT-2026-005', 25, 25, '2026-01-10', '2026-10-21', 3.89, 'active'),
-('lot-beb-suco-natone-500', 'comp-cesta-1', 'beb-suco-natone-500', 'LOT-2026-006', 25, 25, '2026-01-10', '2026-09-20', 6.54, 'active'),
-('lot-beb-guarana-350', 'comp-cesta-1', 'beb-guarana-350', 'LOT-2026-007', 25, 25, '2026-01-10', '2027-03-05', 2.99, 'active'),
-('lot-beb-cha-leao-450', 'comp-cesta-1', 'beb-cha-leao-450', 'LOT-2026-008', 25, 25, '2026-01-10', '2026-12-05', 4.14, 'active'),
-('lot-beb-suco-aurora-1l', 'comp-cesta-1', 'beb-suco-aurora-1l', 'LOT-2026-009', 25, 25, '2026-01-10', '2027-01-04', 11.34, 'active'),
-('lot-beb-maguary-1l', 'comp-cesta-1', 'beb-maguary-1l', 'LOT-2026-010', 25, 25, '2026-01-10', '2026-12-15', 5.94, 'active'),
-('lot-beb-guarana-1l', 'comp-cesta-1', 'beb-guarana-1l', 'LOT-2026-011', 25, 25, '2026-01-10', '2027-03-05', 5.09, 'active'),
-('lot-pb-pao-forma-pullman', 'comp-cesta-1', 'pb-pao-forma-pullman', 'LOT-2026-012', 25, 25, '2026-01-10', '2026-09-20', 5.94, 'active'),
-('lot-pb-bisnaguinha-wickbold', 'comp-cesta-1', 'pb-bisnaguinha-wickbold', 'LOT-2026-013', 25, 25, '2026-01-10', '2026-09-24', 4.49, 'active'),
-('lot-pb-bolo-anamaria', 'comp-cesta-1', 'pb-bolo-anamaria', 'LOT-2026-014', 25, 25, '2026-01-10', '2026-10-06', 2.09, 'active'),
-('lot-pb-pao-queijo-fdm', 'comp-cesta-1', 'pb-pao-queijo-fdm', 'LOT-2026-015', 25, 25, '2026-01-10', '2026-12-05', 10.14, 'active'),
-('lot-pb-croissant', 'comp-cesta-1', 'pb-croissant', 'LOT-2026-016', 25, 25, '2026-01-10', '2026-09-09', 3.30, 'active'),
-('lot-pb-rosca-coco', 'comp-cesta-1', 'pb-rosca-coco', 'LOT-2026-017', 25, 25, '2026-01-10', '2026-09-11', 7.74, 'active'),
-('lot-bis-trakinas-morango', 'comp-cesta-1', 'bis-trakinas-morango', 'LOT-2026-018', 25, 25, '2026-01-10', '2027-02-03', 1.91, 'active'),
-('lot-bis-negresco', 'comp-cesta-1', 'bis-negresco', 'LOT-2026-019', 25, 25, '2026-01-10', '2027-02-03', 2.09, 'active'),
-('lot-bis-bono-choc', 'comp-cesta-1', 'bis-bono-choc', 'LOT-2026-020', 25, 25, '2026-01-10', '2027-02-03', 1.97, 'active'),
-('lot-bis-passatempo', 'comp-cesta-1', 'bis-passatempo', 'LOT-2026-021', 25, 25, '2026-01-10', '2027-02-03', 2.03, 'active'),
-('lot-bis-club-social', 'comp-cesta-1', 'bis-club-social', 'LOT-2026-022', 25, 25, '2026-01-10', '2026-12-05', 3.29, 'active'),
-('lot-bis-cream-cracker-adria', 'comp-cesta-1', 'bis-cream-cracker-adria', 'LOT-2026-023', 25, 25, '2026-01-10', '2027-01-04', 2.57, 'active'),
-('lot-bis-waffer-bauducco', 'comp-cesta-1', 'bis-waffer-bauducco', 'LOT-2026-024', 25, 25, '2026-01-10', '2027-02-03', 2.27, 'active'),
-('lot-fq-queijo-prato-sadia', 'comp-cesta-1', 'fq-queijo-prato-sadia', 'LOT-2026-025', 25, 25, '2026-01-10', '2026-09-18', 7.74, 'active'),
-('lot-fq-presunto-seara', 'comp-cesta-1', 'fq-presunto-seara', 'LOT-2026-026', 25, 25, '2026-01-10', '2026-09-11', 5.94, 'active'),
-('lot-fq-mussarela-tirolez', 'comp-cesta-1', 'fq-mussarela-tirolez', 'LOT-2026-027', 25, 25, '2026-01-10', '2026-09-21', 8.10, 'active'),
-('lot-fq-requeijao-catupiry', 'comp-cesta-1', 'fq-requeijao-catupiry', 'LOT-2026-028', 25, 25, '2026-01-10', '2026-10-16', 7.14, 'active'),
-('lot-dg-geleia-queensberry', 'comp-cesta-1', 'dg-geleia-queensberry', 'LOT-2026-029', 25, 25, '2026-01-10', '2027-07-03', 9.54, 'active'),
-('lot-dg-nutella-140', 'comp-cesta-1', 'dg-nutella-140', 'LOT-2026-030', 25, 25, '2026-01-10', '2027-07-03', 8.34, 'active'),
-('lot-dg-doce-leite-aviacao', 'comp-cesta-1', 'dg-doce-leite-aviacao', 'LOT-2026-031', 25, 25, '2026-01-10', '2027-07-03', 7.50, 'active'),
-('lot-dg-mel-karo', 'comp-cesta-1', 'dg-mel-karo', 'LOT-2026-032', 25, 25, '2026-01-10', '2027-07-03', 8.94, 'active'),
-('lot-dg-pacoca-yoki', 'comp-cesta-1', 'dg-pacoca-yoki', 'LOT-2026-033', 25, 25, '2026-01-10', '2027-07-03', 0.77, 'active'),
-('lot-fr-maca', 'comp-cesta-1', 'fr-maca', 'LOT-2026-034', 25, 25, '2026-01-10', '2026-09-18', 1.19, 'active'),
-('lot-fr-banana', 'comp-cesta-1', 'fr-banana', 'LOT-2026-035', 25, 25, '2026-01-10', '2026-09-18', 0.77, 'active'),
-('lot-fr-uva-verde', 'comp-cesta-1', 'fr-uva-verde', 'LOT-2026-036', 25, 25, '2026-01-10', '2026-09-18', 4.14, 'active'),
-('lot-fr-morango-bandeja', 'comp-cesta-1', 'fr-morango-bandeja', 'LOT-2026-037', 25, 25, '2026-01-10', '2026-09-18', 5.94, 'active'),
-('lot-fr-kiwi', 'comp-cesta-1', 'fr-kiwi', 'LOT-2026-038', 25, 25, '2026-01-10', '2026-09-18', 1.49, 'active'),
-('lot-mc-cafe-pilao-sache', 'comp-cesta-1', 'mc-cafe-pilao-sache', 'LOT-2026-039', 25, 25, '2026-01-10', '2026-11-05', 0.89, 'active'),
-('lot-mc-capuccino-3coracoes', 'comp-cesta-1', 'mc-capuccino-3coracoes', 'LOT-2026-040', 25, 25, '2026-01-10', '2026-11-05', 1.49, 'active'),
-('lot-mc-cha-twinings', 'comp-cesta-1', 'mc-cha-twinings', 'LOT-2026-041', 25, 25, '2026-01-10', '2026-11-05', 7.14, 'active'),
-('lot-mc-manteiga-aviacao', 'comp-cesta-1', 'mc-manteiga-aviacao', 'LOT-2026-042', 25, 25, '2026-01-10', '2026-11-05', 8.34, 'active'),
-('lot-mc-acucar-sache', 'comp-cesta-1', 'mc-acucar-sache', 'LOT-2026-043', 25, 25, '2026-01-10', '2026-11-05', 2.34, 'active'),
-('lot-ad-caneca', 'comp-cesta-1', 'ad-caneca', 'LOT-2026-044', 25, 25, '2026-01-10', '2026-11-05', 14.94, 'active'),
-('lot-ad-cartao', 'comp-cesta-1', 'ad-cartao', 'LOT-2026-045', 25, 25, '2026-01-10', '2026-11-05', 3.00, 'active'),
-('lot-ad-balao', 'comp-cesta-1', 'ad-balao', 'LOT-2026-046', 25, 25, '2026-01-10', '2026-11-05', 8.94, 'active'),
-('lot-ad-mini-buque', 'comp-cesta-1', 'ad-mini-buque', 'LOT-2026-047', 25, 25, '2026-01-10', '2026-11-05', 17.94, 'active'),
-('lot-ad-espumante', 'comp-cesta-1', 'ad-espumante', 'LOT-2026-048', 25, 25, '2026-01-10', '2026-11-05', 13.74, 'active'),
-('lot-ad-vinho-pergola', 'comp-cesta-1', 'ad-vinho-pergola', 'LOT-2026-049', 25, 25, '2026-01-10', '2026-11-05', 17.94, 'active'),
-('lot-ad-chocolate-lindt', 'comp-cesta-1', 'ad-chocolate-lindt', 'LOT-2026-050', 25, 25, '2026-01-10', '2026-11-05', 20.94, 'active'),
-('lot-ad-taca', 'comp-cesta-1', 'ad-taca', 'LOT-2026-051', 25, 25, '2026-01-10', '2026-11-05', 11.94, 'active')
+INSERT INTO marketflow.lots (id, company_id, product_id, lot_number, initial_quantity, current_quantity, manufacturing_date, expiration_date, cost_price, status) VALUES
+('lot-beb-suco-delvalle-200', 'comp-cesta-1', 'beb-suco-delvalle-200', 'LOT-2026-001', 25, 25, '2026-01-10', '2026-12-15', 2.69, 'active'),
+('lot-beb-toddynho-200', 'comp-cesta-1', 'beb-toddynho-200', 'LOT-2026-002', 25, 25, '2026-01-10', '2026-12-30', 1.97, 'active'),
+('lot-beb-agua-coco-200', 'comp-cesta-1', 'beb-agua-coco-200', 'LOT-2026-003', 25, 25, '2026-01-10', '2027-01-14', 2.99, 'active'),
+('lot-beb-iog-danone-170', 'comp-cesta-1', 'beb-iog-danone-170', 'LOT-2026-004', 25, 25, '2026-01-10', '2026-10-23', 2.27, 'active'),
+('lot-beb-ades-500', 'comp-cesta-1', 'beb-ades-500', 'LOT-2026-005', 25, 25, '2026-01-10', '2026-11-30', 3.89, 'active'),
+('lot-beb-suco-natone-500', 'comp-cesta-1', 'beb-suco-natone-500', 'LOT-2026-006', 25, 25, '2026-01-10', '2026-10-30', 6.54, 'active'),
+('lot-beb-guarana-350', 'comp-cesta-1', 'beb-guarana-350', 'LOT-2026-007', 25, 25, '2026-01-10', '2027-04-14', 2.99, 'active'),
+('lot-beb-cha-leao-450', 'comp-cesta-1', 'beb-cha-leao-450', 'LOT-2026-008', 25, 25, '2026-01-10', '2027-01-14', 4.14, 'active'),
+('lot-beb-suco-aurora-1l', 'comp-cesta-1', 'beb-suco-aurora-1l', 'LOT-2026-009', 25, 25, '2026-01-10', '2027-02-13', 11.34, 'active'),
+('lot-beb-maguary-1l', 'comp-cesta-1', 'beb-maguary-1l', 'LOT-2026-010', 25, 25, '2026-01-10', '2027-01-24', 5.94, 'active'),
+('lot-beb-guarana-1l', 'comp-cesta-1', 'beb-guarana-1l', 'LOT-2026-011', 25, 25, '2026-01-10', '2027-04-14', 5.09, 'active'),
+('lot-pb-pao-forma-pullman', 'comp-cesta-1', 'pb-pao-forma-pullman', 'LOT-2026-012', 25, 25, '2026-01-10', '2026-10-30', 5.94, 'active'),
+('lot-pb-bisnaguinha-wickbold', 'comp-cesta-1', 'pb-bisnaguinha-wickbold', 'LOT-2026-013', 25, 25, '2026-01-10', '2026-11-03', 4.49, 'active'),
+('lot-pb-bolo-anamaria', 'comp-cesta-1', 'pb-bolo-anamaria', 'LOT-2026-014', 25, 25, '2026-01-10', '2026-11-15', 2.09, 'active'),
+('lot-pb-pao-queijo-fdm', 'comp-cesta-1', 'pb-pao-queijo-fdm', 'LOT-2026-015', 25, 25, '2026-01-10', '2027-01-14', 10.14, 'active'),
+('lot-pb-croissant', 'comp-cesta-1', 'pb-croissant', 'LOT-2026-016', 25, 25, '2026-01-10', '2026-10-19', 3.30, 'active'),
+('lot-pb-rosca-coco', 'comp-cesta-1', 'pb-rosca-coco', 'LOT-2026-017', 25, 25, '2026-01-10', '2026-10-21', 7.74, 'active'),
+('lot-bis-trakinas-morango', 'comp-cesta-1', 'bis-trakinas-morango', 'LOT-2026-018', 25, 25, '2026-01-10', '2027-03-15', 1.91, 'active'),
+('lot-bis-negresco', 'comp-cesta-1', 'bis-negresco', 'LOT-2026-019', 25, 25, '2026-01-10', '2027-03-15', 2.09, 'active'),
+('lot-bis-bono-choc', 'comp-cesta-1', 'bis-bono-choc', 'LOT-2026-020', 25, 25, '2026-01-10', '2027-03-15', 1.97, 'active'),
+('lot-bis-passatempo', 'comp-cesta-1', 'bis-passatempo', 'LOT-2026-021', 25, 25, '2026-01-10', '2027-03-15', 2.03, 'active'),
+('lot-bis-club-social', 'comp-cesta-1', 'bis-club-social', 'LOT-2026-022', 25, 25, '2026-01-10', '2027-01-14', 3.29, 'active'),
+('lot-bis-cream-cracker-adria', 'comp-cesta-1', 'bis-cream-cracker-adria', 'LOT-2026-023', 25, 25, '2026-01-10', '2027-02-13', 2.57, 'active'),
+('lot-bis-waffer-bauducco', 'comp-cesta-1', 'bis-waffer-bauducco', 'LOT-2026-024', 25, 25, '2026-01-10', '2027-03-15', 2.27, 'active'),
+('lot-fq-queijo-prato-sadia', 'comp-cesta-1', 'fq-queijo-prato-sadia', 'LOT-2026-025', 25, 25, '2026-01-10', '2026-10-28', 7.74, 'active'),
+('lot-fq-presunto-seara', 'comp-cesta-1', 'fq-presunto-seara', 'LOT-2026-026', 25, 25, '2026-01-10', '2026-10-21', 5.94, 'active'),
+('lot-fq-mussarela-tirolez', 'comp-cesta-1', 'fq-mussarela-tirolez', 'LOT-2026-027', 25, 25, '2026-01-10', '2026-10-31', 8.10, 'active'),
+('lot-fq-requeijao-catupiry', 'comp-cesta-1', 'fq-requeijao-catupiry', 'LOT-2026-028', 25, 25, '2026-01-10', '2026-11-25', 7.14, 'active'),
+('lot-dg-geleia-queensberry', 'comp-cesta-1', 'dg-geleia-queensberry', 'LOT-2026-029', 25, 25, '2026-01-10', '2027-08-12', 9.54, 'active'),
+('lot-dg-nutella-140', 'comp-cesta-1', 'dg-nutella-140', 'LOT-2026-030', 25, 25, '2026-01-10', '2027-08-12', 8.34, 'active'),
+('lot-dg-doce-leite-aviacao', 'comp-cesta-1', 'dg-doce-leite-aviacao', 'LOT-2026-031', 25, 25, '2026-01-10', '2027-08-12', 7.50, 'active'),
+('lot-dg-mel-karo', 'comp-cesta-1', 'dg-mel-karo', 'LOT-2026-032', 25, 25, '2026-01-10', '2027-08-12', 8.94, 'active'),
+('lot-dg-pacoca-yoki', 'comp-cesta-1', 'dg-pacoca-yoki', 'LOT-2026-033', 25, 25, '2026-01-10', '2027-08-12', 0.77, 'active'),
+('lot-fr-maca', 'comp-cesta-1', 'fr-maca', 'LOT-2026-034', 25, 25, '2026-01-10', '2026-10-28', 1.19, 'active'),
+('lot-fr-banana', 'comp-cesta-1', 'fr-banana', 'LOT-2026-035', 25, 25, '2026-01-10', '2026-10-28', 0.77, 'active'),
+('lot-fr-uva-verde', 'comp-cesta-1', 'fr-uva-verde', 'LOT-2026-036', 25, 25, '2026-01-10', '2026-10-28', 4.14, 'active'),
+('lot-fr-morango-bandeja', 'comp-cesta-1', 'fr-morango-bandeja', 'LOT-2026-037', 25, 25, '2026-01-10', '2026-10-28', 5.94, 'active'),
+('lot-fr-kiwi', 'comp-cesta-1', 'fr-kiwi', 'LOT-2026-038', 25, 25, '2026-01-10', '2026-10-28', 1.49, 'active'),
+('lot-mc-cafe-pilao-sache', 'comp-cesta-1', 'mc-cafe-pilao-sache', 'LOT-2026-039', 25, 25, '2026-01-10', '2026-12-15', 0.89, 'active'),
+('lot-mc-capuccino-3coracoes', 'comp-cesta-1', 'mc-capuccino-3coracoes', 'LOT-2026-040', 25, 25, '2026-01-10', '2026-12-15', 1.49, 'active'),
+('lot-mc-cha-twinings', 'comp-cesta-1', 'mc-cha-twinings', 'LOT-2026-041', 25, 25, '2026-01-10', '2026-12-15', 7.14, 'active'),
+('lot-mc-manteiga-aviacao', 'comp-cesta-1', 'mc-manteiga-aviacao', 'LOT-2026-042', 25, 25, '2026-01-10', '2026-12-15', 8.34, 'active'),
+('lot-mc-acucar-sache', 'comp-cesta-1', 'mc-acucar-sache', 'LOT-2026-043', 25, 25, '2026-01-10', '2026-12-15', 2.34, 'active'),
+('lot-ad-caneca', 'comp-cesta-1', 'ad-caneca', 'LOT-2026-044', 25, 25, '2026-01-10', '2026-12-15', 14.94, 'active'),
+('lot-ad-cartao', 'comp-cesta-1', 'ad-cartao', 'LOT-2026-045', 25, 25, '2026-01-10', '2026-12-15', 3.00, 'active'),
+('lot-ad-balao', 'comp-cesta-1', 'ad-balao', 'LOT-2026-046', 25, 25, '2026-01-10', '2026-12-15', 8.94, 'active'),
+('lot-ad-mini-buque', 'comp-cesta-1', 'ad-mini-buque', 'LOT-2026-047', 25, 25, '2026-01-10', '2026-12-15', 17.94, 'active'),
+('lot-ad-espumante', 'comp-cesta-1', 'ad-espumante', 'LOT-2026-048', 25, 25, '2026-01-10', '2026-12-15', 13.74, 'active'),
+('lot-ad-vinho-pergola', 'comp-cesta-1', 'ad-vinho-pergola', 'LOT-2026-049', 25, 25, '2026-01-10', '2026-12-15', 17.94, 'active'),
+('lot-ad-chocolate-lindt', 'comp-cesta-1', 'ad-chocolate-lindt', 'LOT-2026-050', 25, 25, '2026-01-10', '2026-12-15', 20.94, 'active'),
+('lot-ad-taca', 'comp-cesta-1', 'ad-taca', 'LOT-2026-051', 25, 25, '2026-01-10', '2026-12-15', 11.94, 'active')
 ON CONFLICT (id) DO UPDATE SET expiration_date = EXCLUDED.expiration_date;
+
+-- ====================================================================
+-- INSTRUÇÕES DE EXPOSIÇÃO DA API NO SUPABASE DASHBOARD:
+-- 1. No Supabase Dashboard, acesse: Project Settings > API > Data API Settings
+-- 2. No campo "Exposed schemas", adicione "marketflow" (ex: public, serviceforge, marketflow)
+-- 3. Clique em "Save" para aplicar.
+-- ====================================================================
+
+-- LIMPEZA OPCIONAL NO SCHEMA PUBLIC (APENAS SE DESEJAR REMOVER TABELAS ANTIGAS DO PUBLIC):
+-- Descomente as linhas abaixo caso queira remover as tabelas do MarketFlow que estavam no schema public:
+-- DROP TABLE IF EXISTS public.catalog_requests CASCADE;
+-- DROP TABLE IF EXISTS public.inventory_movements CASCADE;
+-- DROP TABLE IF EXISTS public.lots CASCADE;
+-- DROP TABLE IF EXISTS public.inventory_items CASCADE;
+-- DROP TABLE IF EXISTS public.products CASCADE;
+-- DROP TABLE IF EXISTS public.suppliers CASCADE;
+-- DROP TABLE IF EXISTS public.brands CASCADE;
+-- DROP TABLE IF EXISTS public.manufacturers CASCADE;
+-- DROP TABLE IF EXISTS public.categories CASCADE;
+-- DROP TABLE IF EXISTS public.company_users CASCADE;
+-- DROP TABLE IF EXISTS public.companies CASCADE;

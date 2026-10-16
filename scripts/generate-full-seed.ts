@@ -22,21 +22,35 @@ function generate() {
   const products = getRealProducts(REAL_COMPANY.id);
 
   let sql = `-- ====================================================================
--- MarketFlow — Consolidated Database Schema & Complete Seed Data
+-- MarketFlow — Dedicated Database Schema & Complete Seed Data
 -- Target Database: Supabase PostgreSQL (project: mfyyezvpfpflpekosjif)
+-- Dedicated Schema: "marketflow" (Isolamento total de outros projetos como serviceforge)
 -- ====================================================================
+
+-- 0. Criar Schema Dedicado "marketflow"
+CREATE SCHEMA IF NOT EXISTS marketflow;
+
+-- Conceder permissões no schema para os papéis de acesso do Supabase
+GRANT USAGE ON SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA marketflow TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA marketflow TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA marketflow GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
 
 -- 1. Custom Types & Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 DO $$ BEGIN
-  CREATE TYPE public.app_role AS ENUM ('global_admin', 'admin', 'stock', 'visitor');
+  CREATE TYPE marketflow.app_role AS ENUM ('global_admin', 'admin', 'stock', 'visitor');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
 
 -- 2. Profiles (Linked to auth.users)
-CREATE TABLE IF NOT EXISTS public.profiles (
+CREATE TABLE IF NOT EXISTS marketflow.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name VARCHAR(150) NOT NULL,
   avatar_url TEXT,
@@ -46,10 +60,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 -- Trigger: auto-create profile on auth.users sign up
-CREATE OR REPLACE FUNCTION public.handle_new_user()
+CREATE OR REPLACE FUNCTION marketflow.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, avatar_url, phone)
+  INSERT INTO marketflow.profiles (id, full_name, avatar_url, phone)
   VALUES (
     new.id,
     COALESCE(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
@@ -63,19 +77,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
+DROP TRIGGER IF EXISTS on_auth_user_created_marketflow ON auth.users;
+CREATE TRIGGER on_auth_user_created_marketflow
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  FOR EACH ROW EXECUTE FUNCTION marketflow.handle_new_user();
 
 -- Auto-create profile for any existing auth.users
-INSERT INTO public.profiles (id, full_name, created_at, updated_at)
+INSERT INTO marketflow.profiles (id, full_name, created_at, updated_at)
 SELECT id, COALESCE(raw_user_meta_data->>'full_name', split_part(email, '@', 1)), now(), now()
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Companies (Tenants)
-CREATE TABLE IF NOT EXISTS public.companies (
+CREATE TABLE IF NOT EXISTS marketflow.companies (
   id TEXT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   legal_name VARCHAR(200),
@@ -91,31 +105,31 @@ CREATE TABLE IF NOT EXISTS public.companies (
   avisoRodape TEXT,
   breakfast_basket_enabled BOOLEAN NOT NULL DEFAULT true,
   active BOOLEAN NOT NULL DEFAULT true,
-  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_by UUID REFERENCES marketflow.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ
 );
 
 -- 4. Company Users (Tenant Membership & Roles)
-CREATE TABLE IF NOT EXISTS public.company_users (
+CREATE TABLE IF NOT EXISTS marketflow.company_users (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  role public.app_role NOT NULL DEFAULT 'admin',
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES marketflow.profiles(id) ON DELETE CASCADE,
+  role marketflow.app_role NOT NULL DEFAULT 'admin',
   active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT unique_company_user UNIQUE(company_id, user_id)
+  CONSTRAINT unique_company_user_mf UNIQUE(company_id, user_id)
 );
 
 -- 5. Categories
-CREATE TABLE IF NOT EXISTS public.categories (
+CREATE TABLE IF NOT EXISTS marketflow.categories (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(100) NOT NULL,
   description TEXT,
-  parent_id TEXT REFERENCES public.categories(id) ON DELETE SET NULL,
+  parent_id TEXT REFERENCES marketflow.categories(id) ON DELETE SET NULL,
   image_url TEXT,
   active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -124,9 +138,9 @@ CREATE TABLE IF NOT EXISTS public.categories (
 );
 
 -- 6. Manufacturers (Fabricantes)
-CREATE TABLE IF NOT EXISTS public.manufacturers (
+CREATE TABLE IF NOT EXISTS marketflow.manufacturers (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(150) NOT NULL,
   document VARCHAR(30),
   phone VARCHAR(30),
@@ -140,9 +154,9 @@ CREATE TABLE IF NOT EXISTS public.manufacturers (
 );
 
 -- 7. Brands (Marcas)
-CREATE TABLE IF NOT EXISTS public.brands (
+CREATE TABLE IF NOT EXISTS marketflow.brands (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(100) NOT NULL,
   description TEXT,
   logo_url TEXT,
@@ -153,9 +167,9 @@ CREATE TABLE IF NOT EXISTS public.brands (
 );
 
 -- 8. Suppliers (Fornecedores)
-CREATE TABLE IF NOT EXISTS public.suppliers (
+CREATE TABLE IF NOT EXISTS marketflow.suppliers (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   name VARCHAR(150) NOT NULL,
   legal_name VARCHAR(200),
   cnpj VARCHAR(30),
@@ -171,13 +185,13 @@ CREATE TABLE IF NOT EXISTS public.suppliers (
 );
 
 -- 9. Products (Produtos com Data de Validade & Vínculos Cesta)
-CREATE TABLE IF NOT EXISTS public.products (
+CREATE TABLE IF NOT EXISTS marketflow.products (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  category_id TEXT REFERENCES public.categories(id) ON DELETE SET NULL,
-  brand_id TEXT REFERENCES public.brands(id) ON DELETE SET NULL,
-  supplier_id TEXT REFERENCES public.suppliers(id) ON DELETE SET NULL,
-  manufacturer_id TEXT REFERENCES public.manufacturers(id) ON DELETE SET NULL,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  category_id TEXT REFERENCES marketflow.categories(id) ON DELETE SET NULL,
+  brand_id TEXT REFERENCES marketflow.brands(id) ON DELETE SET NULL,
+  supplier_id TEXT REFERENCES marketflow.suppliers(id) ON DELETE SET NULL,
+  manufacturer_id TEXT REFERENCES marketflow.manufacturers(id) ON DELETE SET NULL,
   name VARCHAR(200) NOT NULL,
   description TEXT,
   sku VARCHAR(50),
@@ -202,23 +216,23 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- 10. Inventory Items (Estoque Consolidado)
-CREATE TABLE IF NOT EXISTS public.inventory_items (
+CREATE TABLE IF NOT EXISTS marketflow.inventory_items (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
   quantity INTEGER NOT NULL DEFAULT 0,
   reserved_quantity INTEGER NOT NULL DEFAULT 0,
   location VARCHAR(100),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT unique_product_inventory UNIQUE (company_id, product_id)
+  CONSTRAINT unique_product_inventory_mf UNIQUE (company_id, product_id)
 );
 
 -- 11. Lots (Lotes com Data de Validade)
-CREATE TABLE IF NOT EXISTS public.lots (
+CREATE TABLE IF NOT EXISTS marketflow.lots (
   id TEXT PRIMARY KEY,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
   lot_number VARCHAR(100) NOT NULL,
   initial_quantity INTEGER NOT NULL DEFAULT 0,
   current_quantity INTEGER NOT NULL DEFAULT 0,
@@ -231,25 +245,25 @@ CREATE TABLE IF NOT EXISTS public.lots (
 );
 
 -- 12. Inventory Movements (Kardex / Movimentações de Estoque)
-CREATE TABLE IF NOT EXISTS public.inventory_movements (
+CREATE TABLE IF NOT EXISTS marketflow.inventory_movements (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  lot_id TEXT REFERENCES public.lots(id) ON DELETE SET NULL,
-  type VARCHAR(30) NOT NULL, -- 'in', 'out', 'transfer', 'adjustment', 'loss'
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
+  product_id TEXT NOT NULL REFERENCES marketflow.products(id) ON DELETE CASCADE,
+  lot_id TEXT REFERENCES marketflow.lots(id) ON DELETE SET NULL,
+  type VARCHAR(30) NOT NULL,
   quantity INTEGER NOT NULL,
   previous_quantity INTEGER NOT NULL DEFAULT 0,
   new_quantity INTEGER NOT NULL DEFAULT 0,
   reason TEXT,
   document_reference VARCHAR(100),
-  performed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  performed_by UUID REFERENCES marketflow.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- 13. Catalog Requests (Pedidos e Contatos da Loja Pública)
-CREATE TABLE IF NOT EXISTS public.catalog_requests (
+CREATE TABLE IF NOT EXISTS marketflow.catalog_requests (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  company_id TEXT NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  company_id TEXT NOT NULL REFERENCES marketflow.companies(id) ON DELETE CASCADE,
   customer_name VARCHAR(150) NOT NULL,
   customer_phone VARCHAR(30) NOT NULL,
   customer_email VARCHAR(255),
@@ -258,192 +272,161 @@ CREATE TABLE IF NOT EXISTS public.catalog_requests (
   delivery_address TEXT,
   gift_message TEXT,
   status VARCHAR(30) NOT NULL DEFAULT 'pending',
-  source VARCHAR(50) DEFAULT 'whatsapp_catalog',
+  notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ====================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) POLICIES NO SCHEMA MARKETFLOW
 -- ====================================================================
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.company_users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.manufacturers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.inventory_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.lots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.catalog_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.company_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.manufacturers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.brands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.suppliers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.inventory_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.lots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.inventory_movements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketflow.catalog_requests ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Public read, user can update own profile
-CREATE POLICY "Profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+-- Políticas de Leitura Pública e Modificação Autenticada
+DO $$ BEGIN
+  CREATE POLICY "Profiles are viewable by everyone" ON marketflow.profiles FOR SELECT USING (true);
+  CREATE POLICY "Users can update their own profile" ON marketflow.profiles FOR ALL USING (auth.uid() = id);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Companies: Public read for active companies (public store), full access for members
-CREATE POLICY "Active companies viewable publicly" ON public.companies FOR SELECT USING (active = true);
-CREATE POLICY "Company members full access to company" ON public.companies FOR ALL TO authenticated USING (
-  id IN (SELECT company_id FROM public.company_users WHERE user_id = auth.uid()) OR
-  created_by = auth.uid()
-);
+DO $$ BEGIN
+  CREATE POLICY "Companies viewable by everyone" ON marketflow.companies FOR SELECT USING (true);
+  CREATE POLICY "Companies manageable by authenticated" ON marketflow.companies FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Company Users: Authenticated members can view users
-CREATE POLICY "Members can view company users" ON public.company_users FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Admins can manage company users" ON public.company_users FOR ALL TO authenticated USING (
-  company_id IN (
-    SELECT company_id FROM public.company_users WHERE user_id = auth.uid() AND role IN ('global_admin', 'admin')
-  )
-);
+DO $$ BEGIN
+  CREATE POLICY "Categories viewable by everyone" ON marketflow.categories FOR SELECT USING (true);
+  CREATE POLICY "Categories manageable by authenticated" ON marketflow.categories FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
--- Generic macro-like policies for tenant tables (public read for store, authenticated edit)
-CREATE POLICY "Public read categories" ON public.categories FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage categories" ON public.categories FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Brands viewable by everyone" ON marketflow.brands FOR SELECT USING (true);
+  CREATE POLICY "Brands manageable by authenticated" ON marketflow.brands FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read brands" ON public.brands FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage brands" ON public.brands FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Products viewable by everyone" ON marketflow.products FOR SELECT USING (true);
+  CREATE POLICY "Products manageable by authenticated" ON marketflow.products FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Authenticated manage manufacturers" ON public.manufacturers FOR ALL TO authenticated USING (true);
-CREATE POLICY "Authenticated manage suppliers" ON public.suppliers FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Inventory viewable by everyone" ON marketflow.inventory_items FOR SELECT USING (true);
+  CREATE POLICY "Inventory manageable by authenticated" ON marketflow.inventory_items FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read products" ON public.products FOR SELECT USING (active = true);
-CREATE POLICY "Authenticated manage products" ON public.products FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Lots viewable by everyone" ON marketflow.lots FOR SELECT USING (true);
+  CREATE POLICY "Lots manageable by authenticated" ON marketflow.lots FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read inventory" ON public.inventory_items FOR SELECT USING (true);
-CREATE POLICY "Authenticated manage inventory" ON public.inventory_items FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Movements viewable by everyone" ON marketflow.inventory_movements FOR SELECT USING (true);
+  CREATE POLICY "Movements manageable by authenticated" ON marketflow.inventory_movements FOR ALL USING (auth.role() = 'authenticated');
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
-CREATE POLICY "Public read lots" ON public.lots FOR SELECT USING (true);
-CREATE POLICY "Authenticated manage lots" ON public.lots FOR ALL TO authenticated USING (true);
-
-CREATE POLICY "Authenticated manage movements" ON public.inventory_movements FOR ALL TO authenticated USING (true);
-
-CREATE POLICY "Public insert catalog requests" ON public.catalog_requests FOR INSERT WITH CHECK (true);
-CREATE POLICY "Company members view catalog requests" ON public.catalog_requests FOR ALL TO authenticated USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Requests insertable by everyone" ON marketflow.catalog_requests FOR INSERT WITH CHECK (true);
+  CREATE POLICY "Requests viewable by authenticated" ON marketflow.catalog_requests FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- ====================================================================
--- SEED DATA
+-- SEED DATA NO SCHEMA MARKETFLOW
 -- ====================================================================
 
--- 1. Empresas
-INSERT INTO public.companies (
-  id, name, legal_name, cnpj, slug, phone, whatsapp, description, subtitulo, moeda, avisoRodape, breakfast_basket_enabled, active
-) VALUES
-(
-  'comp-cesta-1',
-  'Cestas de Café da Manhã',
-  'Olivelas MarketFlow Comércio Ltda',
-  '12.345.678/0001-90',
-  'cestas-cafe-da-manha',
-  '(11) 96382-0374',
-  '5511963820374',
-  'Especialista em cestas de café da manhã e presentes para datas especiais.',
-  'Monte a sua cesta e envie o pedido pelo WhatsApp',
-  'BRL',
-  'Cardápio de exemplo — em ajustes.',
+-- 1. Empresa Principal
+INSERT INTO marketflow.companies (
+  id, name, legal_name, cnpj, slug, phone, whatsapp, description,
+  subtitulo, moeda, avisoRodape, breakfast_basket_enabled, active
+) VALUES (
+  ${escapeSql(REAL_COMPANY.id)},
+  ${escapeSql(REAL_COMPANY.name)},
+  ${escapeSql(REAL_COMPANY.legal_name)},
+  ${escapeSql(REAL_COMPANY.cnpj)},
+  ${escapeSql(REAL_COMPANY.slug)},
+  ${escapeSql(REAL_COMPANY.phone)},
+  ${escapeSql(REAL_COMPANY.whatsapp)},
+  ${escapeSql(REAL_COMPANY.description)},
+  ${escapeSql(REAL_COMPANY.subtitulo)},
+  ${escapeSql(REAL_COMPANY.moeda)},
+  ${escapeSql(REAL_COMPANY.avisoRodape)},
   true,
-  true
-),
-(
-  'comp-2',
-  'Adega & Conveniência Gourmet',
-  'Adega Gourmet Eireli',
-  '98.765.432/0001-10',
-  'adega-gourmet',
-  '(11) 91234-5678',
-  '5511912345678',
-  'Bebidas geladas, aperitivos e conveniência.',
-  'Bebidas e produtos selecionados',
-  'BRL',
-  'Entregas rápidas na região.',
-  false,
   true
 )
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   legal_name = EXCLUDED.legal_name,
   cnpj = EXCLUDED.cnpj,
+  slug = EXCLUDED.slug,
   whatsapp = EXCLUDED.whatsapp,
-  breakfast_basket_enabled = EXCLUDED.breakfast_basket_enabled;
+  description = EXCLUDED.description;
 
--- Vínculo automático de todos os usuários cadastrados como Admin da empresa principal
-INSERT INTO public.company_users (company_id, user_id, role, active)
-SELECT 'comp-cesta-1', id, 'admin'::public.app_role, true
-FROM auth.users
-ON CONFLICT (company_id, user_id) DO NOTHING;
+-- 2. Categorias Oficiais
+INSERT INTO marketflow.categories (id, company_id, name, description, active) VALUES
+('cat-mercearia-cafe', ${escapeSql(REAL_COMPANY.id)}, 'Cafés & Matinais', 'Cafés especiais, chás e matinais', true),
+('cat-bebidas', ${escapeSql(REAL_COMPANY.id)}, 'Bebidas', 'Sucos, achocolatados, cafés prontos, chás e espumantes', true),
+('cat-padaria', ${escapeSql(REAL_COMPANY.id)}, 'Padaria & Confeitaria', 'Pães especiais, torradas, croissants, bolos e waffles', true),
+('cat-frios', ${escapeSql(REAL_COMPANY.id)}, 'Frios & Laticínios', 'Queijos selecionados, iogurtes, manteigas e requeijão', true),
+('cat-biscoitos', ${escapeSql(REAL_COMPANY.id)}, 'Biscoitos & Snacks', 'Cookies artesanais, biscoitos finos, crackers e nuts', true),
+('cat-frutas', ${escapeSql(REAL_COMPANY.id)}, 'Frutas Frescas', 'Frutas higienizadas e selecionadas para consumo imediato', true),
+('cat-geleias', ${escapeSql(REAL_COMPANY.id)}, 'Geleias & Doces', 'Geleias artesanais, mel puro, cremes e chocolates', true),
+('cat-flores', ${escapeSql(REAL_COMPANY.id)}, 'Flores & Afeto', 'Arranjos florais compactos e botões de rosas naturais', true),
+('cat-canecas', ${escapeSql(REAL_COMPANY.id)}, 'Canecas & Lembranças', 'Canecas de cerâmica, xícaras especiais e cartões comemorativos', true),
+('cat-embalagens', ${escapeSql(REAL_COMPANY.id)}, 'Cestas & Embalagens', 'Cestas de vime rústico, caixas cartonadas premium e laços', true),
+('cat-adicionais', ${escapeSql(REAL_COMPANY.id)}, 'Adicionais & Acessórios', 'Itens complementares e brindes decorativos', true)
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, description = EXCLUDED.description;
 
--- 2. Categorias
-INSERT INTO public.categories (id, company_id, name, description, active) VALUES
-('cat-bebidas', 'comp-cesta-1', 'Bebidas', 'Sucos, chás, iogurtes, achocolatados e refrigerantes.', true),
-('cat-paes-bolos', 'comp-cesta-1', 'Pães & Bolos', 'Pães artesanais, torradas, croissants e bolos.', true),
-('cat-biscoitos', 'comp-cesta-1', 'Biscoitos & Bolachas', 'Wafers, cookies e biscoitos doces e salgados.', true),
-('cat-frios-queijos', 'comp-cesta-1', 'Frios & Queijos', 'Queijos selecionados, presunto e requeijão.', true),
-('cat-frutas', 'comp-cesta-1', 'Frutas Selecionadas', 'Frutas frescas e higienizadas da estação.', true),
-('cat-doces-geleias', 'comp-cesta-1', 'Doces & Geleias', 'Nutella, geleias artesanais e mel.', true),
-('cat-chocolates', 'comp-cesta-1', 'Chocolates & Bombons', 'Milka, Ferrero Rocher, Lindt e bombons.', true),
-('cat-canecas-brindes', 'comp-cesta-1', 'Canecas & Brindes', 'Itens comemorativos, canecas e cartões de presente.', true)
+-- 3. Marcas Oficiais (${brands.length} marcas)
+INSERT INTO marketflow.brands (id, company_id, name, description, active) VALUES
+${brands.map(b => `(${escapeSql(b.id)}, ${escapeSql(b.company_id)}, ${escapeSql(b.name)}, ${escapeSql(b.description)}, true)`).join(',\n')}
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 3. Fornecedores
-INSERT INTO public.suppliers (id, company_id, name, legal_name, cnpj, phone, whatsapp, active) VALUES
-('sup-1', 'comp-cesta-1', 'Distribuidora Panificação & Doces SP', 'SP Panificação & Alimentos Ltda', '11.222.333/0001-44', '(11) 3333-4444', '5511963820374', true),
-('sup-2', 'comp-cesta-1', 'Atacado Hortifruti & Laticínios Central', 'Horti Laticínios Atacadista S.A.', '55.666.777/0001-88', '(11) 2222-1111', '5511963820374', true)
+-- 4. Fabricantes Oficiais
+INSERT INTO marketflow.manufacturers (id, company_id, name, document, phone, email, active) VALUES
+('mfg-1', ${escapeSql(REAL_COMPANY.id)}, 'Ambev S.A.', '07.526.557/0001-00', '(11) 2122-1000', 'contato@ambev.com.br', true),
+('mfg-2', ${escapeSql(REAL_COMPANY.id)}, 'Coca-Cola FEMSA Brasil', '45.997.418/0001-53', '0800 021 2121', 'sac@cocacola.com.br', true),
+('mfg-3', ${escapeSql(REAL_COMPANY.id)}, 'Vinícola Aurora Bento Gonçalves', '87.548.724/0001-30', '(54) 3455-2000', 'comercial@vinicolaaurora.com.br', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 4. Fabricantes
-INSERT INTO public.manufacturers (id, company_id, name, document, phone, active) VALUES
-('mfg-1', 'comp-cesta-1', 'Ambev S.A.', '07.526.557/0001-00', '(11) 2122-1000', true),
-('mfg-2', 'comp-cesta-1', 'Coca-Cola FEMSA Brasil', '45.997.418/0001-53', '0800 021 2121', true),
-('mfg-3', 'comp-cesta-1', 'Vinícola Aurora Bento Gonçalves', '87.548.724/0001-30', '(54) 3455-2000', true)
+-- 5. Fornecedores Oficiais
+INSERT INTO marketflow.suppliers (id, company_id, name, legal_name, cnpj, phone, whatsapp, active) VALUES
+('sup-1', ${escapeSql(REAL_COMPANY.id)}, 'Distribuidora Matinais Brasil', 'Distribuidora Matinais Brasil Ltda', '11.222.333/0001-44', '(11) 3344-5566', '5511933445566', true),
+('sup-2', ${escapeSql(REAL_COMPANY.id)}, 'Empório Central de Alimentos', 'Empório Central Alimentos Eireli', '22.333.444/0001-55', '(11) 4455-6677', '5511944556677', true),
+('sup-3', ${escapeSql(REAL_COMPANY.id)}, 'Hortifruti & Flores Selecionadas', 'Hortifruti e Flores Ltda', '33.444.555/0001-66', '(11) 5566-7788', '5511955667788', true)
 ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
 
--- 5. Marcas
-INSERT INTO public.brands (id, company_id, name, active) VALUES
-`;
-
-  const brandValues = brands.map(b => 
-    `(${escapeSql(b.id)}, ${escapeSql(b.company_id)}, ${escapeSql(b.name)}, true)`
-  ).join(',\n');
-  sql += brandValues + '\nON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;\n\n';
-
-  // 6. Produtos
-  sql += `-- 6. Produtos (Todos os 51 Itens Oficiais com Validade Real)\n`;
-  sql += `INSERT INTO public.products (
-  id, company_id, category_id, brand_id, name, description, sku, barcode, unit,
-  cost_price, sale_price, minimum_stock, maximum_stock, expiration_date,
-  active, catalog_visible, show_price, allow_contact, active_in_basket, basket_sizes, drink_tier
+-- 6. Produtos Oficiais (${products.length} itens com shelf-life real)
+INSERT INTO marketflow.products (
+  id, company_id, category_id, brand_id, name, description,
+  cost_price, sale_price, minimum_stock, maximum_stock,
+  expiration_date, active, catalog_visible, show_price, allow_contact,
+  active_in_basket, basket_sizes, drink_tier
 ) VALUES\n`;
 
-  // Mapear nome da marca para brand_id
-  const brandMap = new Map<string, string>();
-  brands.forEach(b => brandMap.set(b.name.toLowerCase().trim(), b.id));
-
-  // Achar marca de cada produto
   const productValues = products.map(p => {
-    // Procura nome da marca correspondente
-    let matchedBrandId: string | null = null;
-    for (const [name, bId] of brandMap.entries()) {
-      if (p.name.toLowerCase().includes(name)) {
-        matchedBrandId = bId;
-        break;
-      }
-    }
+    let catId = p.category_id;
+    if (catId === 'cat-mercearia') catId = 'cat-mercearia-cafe';
 
+    const basketSizesJson = escapeJson(p.basket_sizes || ['pequena', 'media', 'grande']);
+    const drinkTier = p.drink_tier ? `'${p.drink_tier}'` : 'NULL';
     const expDate = p.expiration_date ? `'${p.expiration_date}'` : 'NULL';
-    const basketSizesJson = p.basket_sizes ? escapeJson(p.basket_sizes) : `'["pequena","media","grande"]'::jsonb`;
-    const drinkTier = p.drink_tier ? escapeSql(p.drink_tier) : 'NULL';
 
     return `(
   ${escapeSql(p.id)},
   ${escapeSql(p.company_id)},
-  ${escapeSql(p.category_id)},
-  ${escapeSql(matchedBrandId)},
+  ${escapeSql(catId)},
+  ${escapeSql(p.brand_id)},
   ${escapeSql(p.name)},
   ${escapeSql(p.description)},
-  ${escapeSql(p.sku)},
-  ${escapeSql(p.barcode)},
-  'UN',
   ${p.cost_price.toFixed(2)},
   ${p.sale_price.toFixed(2)},
   ${p.minimum_stock},
@@ -470,7 +453,7 @@ INSERT INTO public.brands (id, company_id, name, active) VALUES
 
   // 7. Estoque Consolidado (inventory_items)
   sql += `-- 7. Estoque Inicial (25 unidades de cada produto)\n`;
-  sql += `INSERT INTO public.inventory_items (id, company_id, product_id, quantity, reserved_quantity, location) VALUES\n`;
+  sql += `INSERT INTO marketflow.inventory_items (id, company_id, product_id, quantity, reserved_quantity, location) VALUES\n`;
   const inventoryValues = products.map(p => 
     `('inv-${p.id}', ${escapeSql(p.company_id)}, ${escapeSql(p.id)}, 25, 0, 'Prateleira A')`
   ).join(',\n');
@@ -478,14 +461,38 @@ INSERT INTO public.brands (id, company_id, name, active) VALUES
 
   // 8. Lotes (lots) com validade
   sql += `-- 8. Lotes com Data de Validade Real\n`;
-  sql += `INSERT INTO public.lots (id, company_id, product_id, lot_number, initial_quantity, current_quantity, manufacturing_date, expiration_date, cost_price, status) VALUES\n`;
+  sql += `INSERT INTO marketflow.lots (id, company_id, product_id, lot_number, initial_quantity, current_quantity, manufacturing_date, expiration_date, cost_price, status) VALUES\n`;
   const lotValues = products.filter(p => p.expiration_date).map((p, idx) => {
     return `('lot-${p.id}', ${escapeSql(p.company_id)}, ${escapeSql(p.id)}, 'LOT-2026-${String(idx + 1).padStart(3, '0')}', 25, 25, '2026-01-10', '${p.expiration_date}', ${p.cost_price.toFixed(2)}, 'active')`;
   }).join(',\n');
-  sql += lotValues + '\nON CONFLICT (id) DO UPDATE SET expiration_date = EXCLUDED.expiration_date;\n';
+  sql += lotValues + '\nON CONFLICT (id) DO UPDATE SET expiration_date = EXCLUDED.expiration_date;\n\n';
 
+  // 9. Comentários de Limpeza Opcional no Schema Public
+  sql += `-- ====================================================================
+-- INSTRUÇÕES DE EXPOSIÇÃO DA API NO SUPABASE DASHBOARD:
+-- 1. No Supabase Dashboard, acesse: Project Settings > API > Data API Settings
+-- 2. No campo "Exposed schemas", adicione "marketflow" (ex: public, serviceforge, marketflow)
+-- 3. Clique em "Save" para aplicar.
+-- ====================================================================
+
+-- LIMPEZA OPCIONAL NO SCHEMA PUBLIC (APENAS SE DESEJAR REMOVER TABELAS ANTIGAS DO PUBLIC):
+-- Descomente as linhas abaixo caso queira remover as tabelas do MarketFlow que estavam no schema public:
+-- DROP TABLE IF EXISTS public.catalog_requests CASCADE;
+-- DROP TABLE IF EXISTS public.inventory_movements CASCADE;
+-- DROP TABLE IF EXISTS public.lots CASCADE;
+-- DROP TABLE IF EXISTS public.inventory_items CASCADE;
+-- DROP TABLE IF EXISTS public.products CASCADE;
+-- DROP TABLE IF EXISTS public.suppliers CASCADE;
+-- DROP TABLE IF EXISTS public.brands CASCADE;
+-- DROP TABLE IF EXISTS public.manufacturers CASCADE;
+-- DROP TABLE IF EXISTS public.categories CASCADE;
+-- DROP TABLE IF EXISTS public.company_users CASCADE;
+-- DROP TABLE IF EXISTS public.companies CASCADE;
+`;
+
+  writeFileSync('supabase/marketflow_schema.sql', sql, 'utf-8');
   writeFileSync('supabase/consolidated_schema.sql', sql, 'utf-8');
-  console.log(`Generated consolidated_schema.sql with ${products.length} products and ${brands.length} brands.`);
+  console.log(`✅ Gerados supabase/marketflow_schema.sql e supabase/consolidated_schema.sql no schema "marketflow" com ${products.length} produtos e ${brands.length} marcas.`);
 }
 
 generate();

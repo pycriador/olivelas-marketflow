@@ -79,6 +79,8 @@ async function seedUsers() {
             'apikey': secretKey,
             'Authorization': `Bearer ${secretKey}`,
             'Content-Type': 'application/json',
+            'Accept-Profile': 'marketflow',
+            'Content-Profile': 'marketflow',
             'Prefer': 'resolution=merge-duplicates'
           },
           body: JSON.stringify({
