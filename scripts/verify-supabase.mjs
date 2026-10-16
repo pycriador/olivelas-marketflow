@@ -31,8 +31,8 @@ console.log('Secret Key:', secretKey ? secretKey.substring(0, 20) + '...' : 'Nã
 console.log('========================================================\n');
 
 async function testProject() {
-  // 1. Testa cliente anônimo (mesmo que roda no navegador)
-  const publicClient = createClient(url, anonKey);
+  // 1. Testa cliente anônimo no schema dedicado "marketflow"
+  const publicClient = createClient(url, anonKey, { db: { schema: 'marketflow' } });
 
   console.log('1. [PING / HTTP] Testando requisição pública REST...');
   try {
